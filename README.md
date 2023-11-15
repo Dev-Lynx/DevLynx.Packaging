@@ -1,3 +1,5 @@
+<img src="./res/pack.svg" width="128" alt="logo">
+
 # DevLynx.Packaging
 
 .NET Library designed to provide an optimal solution to the [Bin Packing Problem](https://en.wikipedia.org/wiki/Bin_packing_problem). This solution was developed solely for three-dimensional (3D) bin packing.
