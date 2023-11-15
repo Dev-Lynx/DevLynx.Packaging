@@ -4,66 +4,105 @@ using DevLynx.Packaging.Models;
 
 namespace DevLynx.Packaging
 {
+    #region Abstractions
+    [DebuggerDisplay("[{Index,nq}] {Dimensions,nq} {Coordinates,nq}")]
+    public struct PackedBox
+    {
+        public int Index { get; }
+        public Vector3 Dimensions { get; }
+        public Vector3 Coordinates { get; }
+
+        public PackedBox(int index, Vector3 dim, Vector3 coord)
+        {
+            Index = index;
+            Dimensions = dim;
+            Coordinates = coord;
+        }
+    }
+
     public class BinPackResult
     {
         public int Iterations { get; }
 
-        public bool IsFit { get; }
+        public int TotalBoxes { get; }
+        public int TotalBoxesPacked { get; }
+
+        public bool WasFullyPacked { get; }
+        public PackedBox[] PackedBoxes { get; }
+
+        public BinPackResult(int iterations, int totalBoxes, PackedBox[] boxes)
+        {
+            Iterations = iterations;
+            TotalBoxes = totalBoxes;
+            TotalBoxesPacked = boxes.Length;
+            PackedBoxes = boxes;
+
+            WasFullyPacked = TotalBoxes == TotalBoxesPacked;
+        }
     }
+    #endregion
 
     public partial class BinPack
     {
-        float _totalVol;
-        float _totalBoxVol;
-        float _packedVolume;
-        int _totalPacked;
-
         Vector3 _bf, _bbf, _dim, _pt, _remP;
         Vector4 _box, _bbox, _cbox;
-
-        Cell _firstCell, _smallZ;
 
         float _preLayer;
         float _layerInLayer;
         float _packedY;
         float _lilz;
 
+        float _totalVol;
+        float _totalBoxVol;
+        float _packedVolume;
+        int _totalPacked;
+        int _iterations;
+
+        Cell _firstCell, _smallZ;
+
         private readonly List<Box> _boxes;
+        private readonly int[] _registry;
         private List<Layer> _layers;
 
         private bool _active;
-        private bool _packing;
-
+        private BinPackResult _res;
 
         public BinPack(IEnumerable<Item> items, Container container)
         {
             _boxes = new List<Box>();
             _layers = new List<Layer>();
             _firstCell = new Cell();
+            
 
             _dim = new Vector3(container.Width, container.Height, container.Depth);
             _totalVol = container.Volume;
 
             Box box;
+            int n = 0;
             foreach (Item item in items)
             {
                 for (int i = 0; i < item.Quantity; i++)
                 {
                     // TODO: Improve Box design
-                    box = new Box(item);
+                    box = new Box(n, item);
 
                     _boxes.Add(box);
                     _totalBoxVol += box.Vol;
+
+                    n++;
                 }
             }
+            
+            _registry = new int[_boxes.Count];
         }
 
-        public void Pack(CancellationToken cancellationToken = default)
+        public BinPackResult Pack(CancellationToken cancellationToken = default)
         {
+            if (_res != null) return _res;
             _active = !cancellationToken.IsCancellationRequested;
 
-            if (!_active) return;
-
+            if (!_active) return GetResult();
+            
             cancellationToken.Register(() => _active = false);
 
             float x = _dim.X, y = _dim.Y, z = _dim.Z;
@@ -97,16 +136,22 @@ namespace DevLynx.Packaging
                         break;
                 }
 
-                Console.WriteLine("Variant: {0} --> {1}", variant, _pt);
-
                 PrepareLayers();
                 EvaluateLayers();
 
-                if (x == y && y == z && variant == 1) variant = 6;
-
-                Console.WriteLine("[RESTART]");
+                if (x == y && y == z && variant == 1)
+                    break;
             }
 
+            return GetResult();
+        }
+
+        private BinPackResult GetResult()
+        {
+            if (_res != null) return _res;
+            _res = new BinPackResult(_iterations, _boxes.Count, Array.Empty<PackedBox>());
+
+            return _res;
         }
 
         private void PrepareLayers()
@@ -183,8 +228,6 @@ namespace DevLynx.Packaging
                         layer.Weight += dimDiff;
                     }
 
-                    Console.WriteLine("Layer: {0}", layer.Weight);
-
                     _layers.Add(layer);
 
                 }
@@ -192,8 +235,6 @@ namespace DevLynx.Packaging
 
             _layers = _layers.OrderBy(x => x.Weight).ToList();
         }
-
-        public int _iteration;
 
         private void EvaluateLayers()
         {
@@ -203,16 +244,12 @@ namespace DevLynx.Packaging
 
             for (int i = 0; i < _layers.Count; i++)
             {
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine();
-                _iteration++;
-                Console.WriteLine("Iteration: {0}", _iteration);
+                _iterations++;
 
                 layer = _layers[i];
                 layerThickness = layer.Dim;
 
+                _totalPacked = 0;
                 _packedVolume = _packedY = 0;
                 _remP.Y = _pt.Y;
                 _remP.Z = _pt.Z;
@@ -221,6 +258,7 @@ namespace DevLynx.Packaging
                 {
                     box = _boxes[x];
                     box.IsPacked = false;
+                    _registry[x] = -1;
                 }
 
                 float prepackedY, preRemPy;
@@ -250,7 +288,7 @@ namespace DevLynx.Packaging
                         _remP.Z = _pt.Z;
                     }
 
-                    Console.WriteLine("[REM]: {0}\t\t[PACKED] {1}", _remP.Y, _packedY);
+                    //Console.WriteLine("[REM]: {0}\t\t[PACKED] {1}", _remP.Y, _packedY);
 
                     layerThickness = FindLayer(_remP.Y);
 
@@ -281,7 +319,6 @@ namespace DevLynx.Packaging
         private void PackLayer(ref float layerThickness)
         {
             if (layerThickness <= 0) return;
-            _packing = true;
 
             Box box;
             LayerResult res;
@@ -290,7 +327,7 @@ namespace DevLynx.Packaging
             _firstCell.CumX = _pt.X;
             _firstCell.CumZ = 0;
 
-            while (_packing)
+            while (true)
             {
                 Cell smallZ = FindSmallestZCell();
 
@@ -464,9 +501,7 @@ namespace DevLynx.Packaging
                             smallZ.CumX = smallZ.CumX - _cbox.X;
 
                             // https://github.com/davidmchapman/3DContainerPacking/commit/1f18269960f9681dccb6f084438a580445145adb
-                            // TODO: Switch back to the github version?
-                            box.Co.X = smallZ.CumX - _cbox.X;
-                            //box.Co.X = smallZ.CumX;
+                            box.Co.X = smallZ.CumX;
                         }
                         else
                         {
@@ -542,8 +577,6 @@ namespace DevLynx.Packaging
 
                 UpdatePackedVolume();
             }
-
-            _packing = false;
         }
 
         private void UpdatePackedVolume()
@@ -552,19 +585,40 @@ namespace DevLynx.Packaging
             box.IsPacked = true;
             box.Pack = new Vector3(_cbox.X, _cbox.Y, _cbox.Z);
 
-            _totalPacked++;
+            
             _packedVolume += box.Vol;
 
-            Console.WriteLine("Packed: [{0}] {1} {2}", _cbox.W, box.Pack, box.Dim);
-
-            //Console.WriteLine("Vol: {0} vs {1}", _packedVolume, _totalBoxVol);
+            //Console.WriteLine("Packed: [{0}] {1} {2}", _cbox.W, box.Pack, box.Co);
+            _registry[_totalPacked] = box.Index;
+            _totalPacked++;
 
             if (_packedVolume == _totalVol || _packedVolume == _totalBoxVol)
             {
-                //_packing = false;
-                //_active = false;
-                Console.WriteLine("**************[FULLY PACKED]************** [{0:N2} %]", (_packedVolume / _totalBoxVol) * 100);
+                PrepareReport();
             }
+        }
+
+        private void PrepareReport()
+        {
+            _active = false;
+
+            Box box;
+            int index, j = 0;
+            PackedBox[] packed = new PackedBox[_totalPacked];
+
+            for (int i = 0; i < _boxes.Count; i++)
+            {
+                index = _registry[i];
+
+                if (index < 0) continue;
+
+                box = _boxes[index];
+                packed[j++] = new PackedBox(index, box.Pack, box.Co);
+            }
+
+            _res = new BinPackResult(_iterations, _boxes.Count, packed);
+
+            //Console.WriteLine("**************[FINISH PACKING]************** [{0:N2} %]", (_packedVolume / _totalBoxVol) * 100);
         }
 
         private void FindBox(float hmx, float hy, float hmy, float hz, float hmz)
@@ -740,8 +794,6 @@ namespace DevLynx.Packaging
         private LayerResult ExamineLayer(ref float layerThickness)
         {
             LayerResult res = LayerResult.None;
-
-            //Console.WriteLine("B: {0}\t BB: {1}", _box, _bbox);
 
             if (_box.W >= 0)
             {

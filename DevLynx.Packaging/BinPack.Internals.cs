@@ -13,29 +13,30 @@ namespace DevLynx.Packaging
     {
         enum LayerResult { None, Evened, Full }
 
+        [DebuggerDisplay("[{Index, nq}] {Dim,nq}")]
         class Box
         {
             public Vector3 Dim;
             public Vector3 Co;
             public Vector3 Pack;
 
+            public int Index;
             public float Vol;
             public bool IsPacked;
 
-            public int Qty;
-
-            public Box(float x, float y, float z)
+            
+            public Box(int n, float x, float y, float z)
             {
+                Index = n;
                 Dim = new Vector3(x, y, z);
                 Vol = x * y * z;
-                Qty = 1;
             }
 
-            public Box(Item item)
+            public Box(int n, Item item)
             {
+                Index = n;
                 Dim = new Vector3(item.Width, item.Height, item.Depth);
                 Vol = item.Volume;
-                Qty = item.Quantity;
             }
 
             public override string ToString()
@@ -56,6 +57,7 @@ namespace DevLynx.Packaging
             }
         }
 
+        [DebuggerDisplay("CumX {CumX,nq} CumZ {CumZ,nq}")]
         class Cell : BiNode
         {
             public float CumX;

@@ -21,9 +21,10 @@ namespace DevLynx.Packaging.Tests
 
             BinPack pack = new BinPack(items, new Container(104, 96, 84));
 
-            pack.Pack();
+            var res = pack.Pack();
 
-            Assert.Pass();
+            Assert.IsFalse(res.WasFullyPacked);
+            Assert.That(res.Iterations == 18, "Iterations should be equal to 18");
         }
     }
 }

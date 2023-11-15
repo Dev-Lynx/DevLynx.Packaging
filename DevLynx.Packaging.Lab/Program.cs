@@ -2,8 +2,7 @@
 using System.Diagnostics;
 
 namespace DevLynx.Packaging.Lab
-{
-    internal class Program
+{    internal class Program
     {
         static void Main(string[] args)
         {
@@ -19,7 +18,13 @@ namespace DevLynx.Packaging.Lab
 
             BinPack pack = new BinPack(items, new Container(104, 96, 84));
 
-            pack.Pack();
+            BinPackResult res = pack.Pack();
+
+            Console.WriteLine("\n\n***************Result is ready: {0}", res.WasFullyPacked);
+            foreach (var packed in res.PackedBoxes)
+            {
+                Console.WriteLine($"{packed.Dimensions} {packed.Coordinates}");
+            }
         }
     }
 }
