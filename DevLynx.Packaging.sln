@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevLynx.Packaging", "DevLynx.Packaging\DevLynx.Packaging.csproj", "{88EAD825-D775-4815-B4D2-D15689E8E7B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging", "DevLynx.Packaging\DevLynx.Packaging.csproj", "{88EAD825-D775-4815-B4D2-D15689E8E7B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevLynx.Packaging.Tests", "DevLynx.Packaging.Tests\DevLynx.Packaging.Tests.csproj", "{880FC3CE-F56A-479A-860B-22C094140B34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging.Tests", "DevLynx.Packaging.Tests\DevLynx.Packaging.Tests.csproj", "{880FC3CE-F56A-479A-860B-22C094140B34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevLynx.Packaging.Lab", "DevLynx.Packaging.Lab\DevLynx.Packaging.Lab.csproj", "{C27922BE-BB24-4985-A551-3ABB04A28863}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging.Lab", "DevLynx.Packaging.Lab\DevLynx.Packaging.Lab.csproj", "{C27922BE-BB24-4985-A551-3ABB04A28863}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
