@@ -32,7 +32,7 @@ namespace DevLynx.Packaging
                 Vol = x * y * z;
             }
 
-            public Box(int n, Item item)
+            public Box(int n, PackItem item)
             {
                 Index = n;
                 Dim = new Vector3(item.Width, item.Height, item.Depth);

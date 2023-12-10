@@ -1,0 +1,12 @@
+﻿<prism:PrismApplication
+    x:Class="DevLynx.Packaging.Visualizer.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/">
+    <Application.Resources>
+        <ResourceDictionary>
+            <BitmapImage x:Key="PaperTexture" UriSource="/UI/Assets/paper_0025.jpg" />
+            <BitmapImage x:Key="PlainPaperTexture" UriSource="/UI/Assets/tx_paper_0021_ao_2k.jpg" />
+        </ResourceDictionary>
+    </Application.Resources>
+</prism:PrismApplication>

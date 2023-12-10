@@ -20,26 +20,43 @@ namespace DevLynx.Packaging.Models
             Depth = depth;
             Volume = width * height * depth;
         }
+
+        public RectPrism(double width, double height, double depth)
+        {
+            Width = Convert.ToSingle(width);
+            Height = Convert.ToSingle(height);
+            Depth = Convert.ToSingle(depth);
+            Volume = Convert.ToSingle(width * height * depth);
+        }
     }
 
-    public class Item : RectPrism
+    public class PackItem : RectPrism
     {
         public int Quantity { get; set; }
 
-        public Item(float width, float height, float depth) : base (width, height, depth)
+        public PackItem(float width, float height, float depth) : base (width, height, depth)
         {
             Quantity = 1;
         }
 
-        public Item(float x, float y, float z, int qty) : base(x, y, z)
+        public PackItem(float x, float y, float z, int qty) : base(x, y, z)
+        {
+            Quantity = qty;
+        }
+
+        public PackItem(double x, double y, double z, int qty) : base(x, y, z)
         {
             Quantity = qty;
         }
     }
 
-    public class Container : RectPrism 
+    public class PackingContainer : RectPrism 
     {
-        public Container(float width, float height, float depth) : base(width, height, depth)
+        public PackingContainer(float width, float height, float depth) : base(width, height, depth)
+        {
+        }
+
+        public PackingContainer(double width, double height, double depth) : base(width, height, depth)
         {
         }
     }

@@ -6,17 +6,17 @@ namespace DevLynx.Packaging.Lab
     {
         static void Main(string[] args)
         {
-            List<Item> items = new List<Item>
+            List<PackItem> items = new List<PackItem>
             {
-                new Item(70, 104, 24, 4),
-                new Item(14, 104, 48, 2),
-                new Item(40, 52, 36, 3)
+                new PackItem(70, 104, 24, 4),
+                new PackItem(14, 104, 48, 2),
+                new PackItem(40, 52, 36, 3)
             };
 
             // TODO: Revert back
             // new Container(104, 96, 84)
 
-            BinPack pack = new BinPack(items, new Container(104, 96, 84));
+            BinPack pack = new BinPack(items, new PackingContainer(104, 96, 84));
 
             BinPackResult res = pack.Pack();
 

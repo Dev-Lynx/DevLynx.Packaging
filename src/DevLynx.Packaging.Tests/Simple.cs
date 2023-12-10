@@ -12,14 +12,14 @@ namespace DevLynx.Packaging.Tests
         [Test]
         public void OriginalTest()
         {
-            List<Item> items = new List<Item>();
+            List<PackItem> items = new List<PackItem>();
 
-            items.Add(new Item(70, 104, 24, 4));
-            items.Add(new Item(14, 104, 48, 2));
-            items.Add(new Item(40, 52, 36, 3));
+            items.Add(new PackItem(70, 104, 24, 4));
+            items.Add(new PackItem(14, 104, 48, 2));
+            items.Add(new PackItem(40, 52, 36, 3));
 
 
-            BinPack pack = new BinPack(items, new Container(104, 96, 84));
+            BinPack pack = new BinPack(items, new PackingContainer(104, 96, 84));
 
             var res = pack.Pack();
 

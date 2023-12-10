@@ -29,12 +29,15 @@ namespace DevLynx.Packaging
 
         public bool WasFullyPacked { get; }
         public PackedBox[] PackedBoxes { get; }
+        
+        public Vector3 PackedDimension { get; }
 
-        public BinPackResult(int iterations, int totalBoxes, PackedBox[] boxes)
+        public BinPackResult(int iterations, int totalBoxes, Vector3 packedDim, PackedBox[] boxes)
         {
             Iterations = iterations;
             TotalBoxes = totalBoxes;
             TotalBoxesPacked = boxes.Length;
+            PackedDimension = packedDim;
             PackedBoxes = boxes;
 
             WasFullyPacked = TotalBoxes == TotalBoxesPacked;
@@ -67,7 +70,7 @@ namespace DevLynx.Packaging
         private bool _active;
         private BinPackResult _res;
 
-        public BinPack(IEnumerable<Item> items, Container container)
+        public BinPack(IEnumerable<PackItem> items, PackingContainer container)
         {
             _boxes = new List<Box>();
             _layers = new List<Layer>();
@@ -79,7 +82,7 @@ namespace DevLynx.Packaging
 
             Box box;
             int n = 0;
-            foreach (Item item in items)
+            foreach (PackItem item in items)
             {
                 for (int i = 0; i < item.Quantity; i++)
                 {
@@ -149,7 +152,7 @@ namespace DevLynx.Packaging
         private BinPackResult GetResult()
         {
             if (_res != null) return _res;
-            _res = new BinPackResult(_iterations, _boxes.Count, Array.Empty<PackedBox>());
+            _res = new BinPackResult(_iterations, _boxes.Count, Vector3.Zero, Array.Empty<PackedBox>());
 
             return _res;
         }
@@ -606,6 +609,9 @@ namespace DevLynx.Packaging
             int index, j = 0;
             PackedBox[] packed = new PackedBox[_totalPacked];
 
+            Vector3 cum, packedDim = new();
+            
+
             for (int i = 0; i < _boxes.Count; i++)
             {
                 index = _registry[i];
@@ -613,10 +619,23 @@ namespace DevLynx.Packaging
                 if (index < 0) continue;
 
                 box = _boxes[index];
+
+                cum = box.Pack + box.Co;
+
+                if (cum.X > packedDim.X)
+                    packedDim.X = cum.X;
+
+                if (cum.Y > packedDim.Y)
+                    packedDim.Y = cum.Y;
+
+                if (cum.Z > packedDim.Z)
+                    packedDim.Z = cum.Z;
+
+
                 packed[j++] = new PackedBox(index, box.Pack, box.Co);
             }
 
-            _res = new BinPackResult(_iterations, _boxes.Count, packed);
+            _res = new BinPackResult(_iterations, _boxes.Count, packedDim, packed);
 
             //Console.WriteLine("**************[FINISH PACKING]************** [{0:N2} %]", (_packedVolume / _totalBoxVol) * 100);
         }
