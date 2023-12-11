@@ -1,26 +1,50 @@
-﻿<Window
+﻿<ui:UiWindow
     x:Class="DevLynx.Packaging.Visualizer.Shell"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app="clr-namespace:DevLynx.Packaging.Visualizer"
+    xmlns:controls="clr-namespace:DevLynx.Packaging.Visualizer.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:local="clr-namespace:DevLynx.Packaging.Visualizer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:rui="clr-namespace:DevLynx.Packaging.Visualizer.UI"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:views="clr-namespace:DevLynx.Packaging.Visualizer.Views"
     xmlns:vm="clr-namespace:DevLynx.Packaging.Visualizer.ViewModels"
-    Title="MainWindow"
+    x:Name="_rootWindow"
+    Title="{Binding Source={x:Static app:AppBase.PRODUCT_NAME}}"
     Width="800"
-    Height="450"
+    Height="800"
+   
     d:DataContext="{d:DesignInstance vm:ShellViewModel}"
     prism:ViewModelLocator.AutoWireViewModel="False"
+    ExtendsContentIntoTitleBar="True"
+    WindowBackdropType="Mica"
+    WindowCornerPreference="Round"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <DockPanel>
-        <Border Padding="10" DockPanel.Dock="Bottom">
-            <Button Command="{Binding ResetCommand}" Content="Reset" />
-        </Border>
+    <Grid>
+        <DockPanel>
+            <ui:TitleBar
+                Title="PackageXD"
+                DockPanel.Dock="Top"
+                ForceShutdown="False"
+                MinimizeToTray="False"
+                ShowHelp="False"
+                ShowMaximize="True"
+                ShowMinimize="True"
+                UseSnapLayout="True" />
 
-        <Border Background="#222">
-            <!--<i:Interaction.Triggers>
+            <DockPanel>
+                <ContentControl prism:RegionManager.RegionName="{Binding Source={x:Static app:AppBase.MAIN_REGION}}" />
+                <!--<Border Padding="10" DockPanel.Dock="Bottom">
+                <Button Command="{Binding ResetCommand}" Content="Reset" />
+            </Border>-->
+
+                <!--<Border Background="#222">
+                -->
+                <!--<i:Interaction.Triggers>
 
                 <i:EventTrigger EventName="MouseUp">
                     <prism:InvokeCommandAction Command="{Binding MouseUpCommand}" />
@@ -29,17 +53,19 @@
                     <prism:InvokeCommandAction Command="{Binding MouseDragCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>-->
-            <Viewport3D x:Name="_view">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Loaded">
-                        <prism:InvokeCommandAction Command="{Binding ModelLoadedCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseDown">
-                        <prism:InvokeCommandAction Command="{Binding MouseDownCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <Viewport3D.Camera>
-                    <!--<PerspectiveCamera
+                <!--
+                <Viewport3D x:Name="_view">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Loaded">
+                            <prism:InvokeCommandAction Command="{Binding ModelLoadedCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseDown">
+                            <prism:InvokeCommandAction Command="{Binding MouseDownCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Viewport3D.Camera>
+                -->
+                <!--<PerspectiveCamera
                         x:Name="_cam"
                         FarPlaneDistance="50"
                         FieldOfView="45"
@@ -47,17 +73,58 @@
                         NearPlaneDistance="0"
                         Position="0,0,5"
                         UpDirection="0,1,0" />-->
-                    <PerspectiveCamera
-                        FarPlaneDistance="50"
-                        FieldOfView="45"
-                        LookDirection="0,0,-10"
-                        NearPlaneDistance="0"
-                        Position="0,0,5"
-                        UpDirection="0,1,0" />
-                </Viewport3D.Camera>
+                <!--
+                        <PerspectiveCamera
+                            FarPlaneDistance="50"
+                            FieldOfView="45"
+                            LookDirection="0,0,-10"
+                            NearPlaneDistance="0"
+                            Position="0,0,5"
+                            UpDirection="0,1,0" />
+                    </Viewport3D.Camera>
 
-                <ModelVisual3D />
-            </Viewport3D>
-        </Border>
-    </DockPanel>
-</Window>
+                    <ModelVisual3D />
+                </Viewport3D>
+            </Border>-->
+            </DockPanel>
+        </DockPanel>
+
+        <ui:Dialog>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Loaded">
+                    <prism:InvokeCommandAction Command="{Binding DialogLoadedCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <ContentControl x:Name="_dialogContent" Content="{Binding Dialog.Kind}">
+                <ContentControl.ContentTemplateSelector>
+                    <rui:DialogSelector>
+                        <rui:DialogSelector.ItemDialogTemplate>
+                            <DataTemplate>
+                                <controls:ViewResolver DataContext="{Binding ElementName=_rootWindow, Path=DataContext}" TargetView="{x:Type views:ItemDialog}" />
+                            </DataTemplate>
+                        </rui:DialogSelector.ItemDialogTemplate>
+
+                        <rui:DialogSelector.EmptyTemplate>
+                            <DataTemplate>
+                                <Border />
+                            </DataTemplate>
+                        </rui:DialogSelector.EmptyTemplate>
+                    </rui:DialogSelector>
+                </ContentControl.ContentTemplateSelector>
+            </ContentControl>
+        </ui:Dialog>
+
+        <ui:Snackbar
+            MaxWidth="600"
+            Appearance="Secondary"
+            CloseButtonEnabled="True"
+            Timeout="5000">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Loaded">
+                    <prism:InvokeCommandAction Command="{Binding SnackbarLoadedCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ui:Snackbar>
+    </Grid>
+</ui:UiWindow>

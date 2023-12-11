@@ -2,11 +2,40 @@
     x:Class="DevLynx.Packaging.Visualizer.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:prism="http://prismlibrary.com/">
+    xmlns:nui="clr-namespace:DevLynx.Packaging.Visualizer.UI"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Light" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
             <BitmapImage x:Key="PaperTexture" UriSource="/UI/Assets/paper_0025.jpg" />
             <BitmapImage x:Key="PlainPaperTexture" UriSource="/UI/Assets/tx_paper_0021_ao_2k.jpg" />
+
+            <ImageBrush
+                x:Key="CartonTextureBrush"
+                ImageSource="{StaticResource PlainPaperTexture}"
+                Stretch="Uniform"
+                TileMode="Tile" />
+
+            <!--#region Cursors-->
+            <Control x:Key="OpenHandCursor" Cursor="/UI/Assets/cur/OpenHand.cur" />
+            <Control x:Key="ClosedHandCursor" Cursor="/UI/Assets/cur/ClosedHand.cur" />
+            <!--#endregion-->
+
+            <!--#region Illustrations-->
+            <BitmapImage x:Key="EastwoodNoComments" UriSource="/UI/Assets/illustrations/eastwood/eastwood-no-comments.png" />
+            <!--#endregion-->
+
+            <!--#region Converters-->
+            <nui:CountToVisibilityConverter x:Key="NotZeroConverter" HiddenCount="0" />
+            <nui:CountToVisibilityConverter
+                x:Key="ZeroConverter"
+                HiddenCount="0"
+                Inverse="True" />
+            <!--#endregion-->
         </ResourceDictionary>
     </Application.Resources>
 </prism:PrismApplication>

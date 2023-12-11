@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using DevLynx.Packaging.Visualizer.Extensions;
+using DevLynx.Packaging.Visualizer.Services;
 using Prism;
 using Prism.Ioc;
 
@@ -20,21 +21,21 @@ namespace DevLynx.Packaging.Visualizer
         {
 #if DEBUG
             ConsoleManager.Show();
-            Console.WriteLine("Welcome to DevLynx.Packaging.Visualizer");
-            Console.WriteLine("All errors will show up here");
+            Console.WriteLine("DevLynx.Packaging.Visualizer © 2023");
 #endif
-
             base.OnStartup(e);
         }
 
         protected override Window CreateShell()
         {
             return Container.Resolve<Shell>();
-            //return new Shell();
         }
 
         protected override void RegisterTypes(IContainerRegistry registry)
         {
+            registry.RegisterScoped<IPackagingService, PackagingService>();
+            registry.RegisterScoped<IMessageService, UIMessageService>();
+            registry.RegisterSingleton<IAppService, AppService>();
         }
     }
 }

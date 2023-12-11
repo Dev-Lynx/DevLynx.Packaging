@@ -1,10 +1,13 @@
 ﻿using DevLynx.Packaging.Visualizer.Extensions;
 using DevLynx.Packaging.Visualizer.Models;
+using DevLynx.Packaging.Visualizer.Models.Contexts;
+using DevLynx.Packaging.Visualizer.Services;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -15,14 +18,23 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
+using Wpf.Ui.Controls;
+using UIDialog = Wpf.Ui.Controls.Dialog;
+using UISnackbar = Wpf.Ui.Controls.Snackbar;
 
 namespace DevLynx.Packaging.Visualizer.ViewModels
 {
-    public class ShellViewModel : BindableBase
+    internal class ShellViewModel : BindableBase
     {
         public ICommand ModelLoadedCommand { get; }
         public ICommand MouseDownCommand { get; }
         public ICommand ResetCommand { get; }
+
+        public ICommand DialogLoadedCommand { get; }
+        public ICommand SnackbarLoadedCommand { get; }
+
+        public DialogContext Dialog => _appService.Context.Dialog;
+        public PackageContext PContext => _packagingService.Context;
 
         private Point _lastPos;
         private Model3DGroup _model;
@@ -30,45 +42,64 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         private PerspectiveCamera _cam;
         private Brush _texture;
 
-        public ShellViewModel()
+        private readonly IAppService _appService;
+        private readonly IMessageService _messageService;
+        private readonly IPackagingService _packagingService;
+
+        public ShellViewModel(IAppService appService, IMessageService messageService, IPackagingService packagingService)
         {
             ModelLoadedCommand = new DelegateCommand<object>(HandleModelLoaded);
             MouseDownCommand = new DelegateCommand<object>(HandleMouseDown);
             ResetCommand = new DelegateCommand(HandleReset);
+            DialogLoadedCommand = new DelegateCommand<object>(HandleDialogLoaded);
+            SnackbarLoadedCommand = new DelegateCommand<object>(HandleSnackbarLoaded);
 
-            
-            ImageBrush brush = new ImageBrush();
-            brush.ImageSource = (BitmapImage)Application.Current.FindResource("PlainPaperTexture");
-            brush.TileMode = TileMode.Tile;
-            brush.Stretch = Stretch.Uniform;
-            brush.Viewport = new Rect(0, 0, 1, 1);
+            _texture = (Brush)Application.Current.FindResource("CartonTextureBrush");
 
-            _texture = brush;
+            _appService = appService;
+            _messageService = messageService;
+            _packagingService = packagingService;
+        }
 
+        private void HandleDialogLoaded(object obj)
+        {
+            if (obj is not RoutedEventArgs e) return;
+            if (e.Source is not UIDialog dialog) return;            
 
+            if (_appService is AppService ap)
+                ap.RegisterDialog(dialog);
+        }
+
+        private void HandleSnackbarLoaded(object obj)
+        {
+            if (obj is not RoutedEventArgs e) return;
+            if (e.Source is not UISnackbar snackbar) return;
+
+            if (_messageService is UIMessageService ums)
+                ums.RegisterSnackbar(snackbar);
         }
 
         private void HandleModelLoaded(object obj)
         {
-            if (obj is not RoutedEventArgs e) return;
-            if (e.Source is not Viewport3D viewport) return;
-            if (viewport.Children.First() is not ModelVisual3D visual) return;
+            //if (obj is not RoutedEventArgs e) return;
+            //if (e.Source is not Viewport3D viewport) return;
+            //if (viewport.Children.First() is not ModelVisual3D visual) return;
 
-            _cam = (PerspectiveCamera)viewport.Camera;
-
-
-            viewport.MouseWheel += HandleMouseWheel;
+            //_cam = (PerspectiveCamera)viewport.Camera;
 
 
-            visual.Content = _model = new Model3DGroup();
-            PrepareLighting(_model);
+            //viewport.MouseWheel += HandleMouseWheel;
 
 
-            var scene = _scene = new Model3DGroup();
-            scene.Transform = new Transform3DGroup();
+            //visual.Content = _model = new Model3DGroup();
+            //PrepareLighting(_model);
 
-            BuildModel(_scene);
-            _model.Children.Add(_scene);
+
+            //var scene = _scene = new Model3DGroup();
+            //scene.Transform = new Transform3DGroup();
+
+            //BuildModel(_scene);
+            //_model.Children.Add(_scene);
         }
 
         private void HandleMouseWheel(object sender, MouseWheelEventArgs e)

@@ -70,6 +70,9 @@ namespace DevLynx.Packaging
         private bool _active;
         private BinPackResult _res;
 
+        public event EventHandler<PackedBox> BoxPacked;
+
+
         public BinPack(IEnumerable<PackItem> items, PackingContainer container)
         {
             _boxes = new List<Box>();
@@ -587,6 +590,11 @@ namespace DevLynx.Packaging
             Box box = _boxes[(int)_cbox.W];
             box.IsPacked = true;
             box.Pack = new Vector3(_cbox.X, _cbox.Y, _cbox.Z);
+
+            if (BoxPacked != null)
+            {
+                BoxPacked.Invoke(this, new PackedBox(box.Index, box.Pack, box.Co));
+            }
 
             
             _packedVolume += box.Vol;
