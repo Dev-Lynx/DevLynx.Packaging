@@ -10,6 +10,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
+                <ResourceDictionary Source="/UI/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BitmapImage x:Key="PaperTexture" UriSource="/UI/Assets/paper_0025.jpg" />
             <BitmapImage x:Key="PlainPaperTexture" UriSource="/UI/Assets/tx_paper_0021_ao_2k.jpg" />
@@ -35,6 +36,7 @@
                 x:Key="ZeroConverter"
                 HiddenCount="0"
                 Inverse="True" />
+            <nui:MathConverter x:Key="MathConverter" />
             <!--#endregion-->
         </ResourceDictionary>
     </Application.Resources>

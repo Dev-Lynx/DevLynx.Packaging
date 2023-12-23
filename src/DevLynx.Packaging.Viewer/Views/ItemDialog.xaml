@@ -6,6 +6,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:DevLynx.Packaging.Visualizer.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:nctx="clr-namespace:DevLynx.Packaging.Visualizer.Models.Contexts"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:rui="clr-namespace:DevLynx.Packaging.Visualizer.UI"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -34,41 +35,50 @@
             <StackPanel Margin="0,10,0,0" DockPanel.Dock="Top">
                 <Label Content="Width" />
 
-                <ui:TextBox
+                <ui:NumberBox
                     ClearButtonEnabled="False"
+                    MaxDecimalPlaces="8"
+                    Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
+                    Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
                     PlaceholderText="Width"
-                    Text="{Binding PContext.NewItem.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    Text="{Binding PContext.NewItem.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                     <i:Interaction.Behaviors>
                         <rui:AutoFocusBehavior />
                         <rui:AutoHighlightBehavior />
                     </i:Interaction.Behaviors>
-                </ui:TextBox>
+                </ui:NumberBox>
             </StackPanel>
 
             <StackPanel Margin="0,10,0,0" DockPanel.Dock="Top">
                 <Label Content="Height" />
 
-                <ui:TextBox
+                <ui:NumberBox
                     ClearButtonEnabled="False"
+                    MaxDecimalPlaces="8"
+                    Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
+                    Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
                     PlaceholderText="Height"
-                    Text="{Binding PContext.NewItem.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    Text="{Binding PContext.NewItem.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                     <i:Interaction.Behaviors>
                         <rui:AutoHighlightBehavior />
                     </i:Interaction.Behaviors>
-                </ui:TextBox>
+                </ui:NumberBox>
             </StackPanel>
 
             <StackPanel Margin="0,10,0,0" DockPanel.Dock="Top">
                 <Label Content="Length" />
 
-                <ui:TextBox
+                <ui:NumberBox
                     ClearButtonEnabled="False"
+                    MaxDecimalPlaces="8"
+                    Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
+                    Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
                     PlaceholderText="Length"
-                    Text="{Binding PContext.NewItem.Depth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    Text="{Binding PContext.NewItem.Depth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                     <i:Interaction.Behaviors>
                         <rui:AutoHighlightBehavior />
                     </i:Interaction.Behaviors>
-                </ui:TextBox>
+                </ui:NumberBox>
             </StackPanel>
         </DockPanel>
     </Border>

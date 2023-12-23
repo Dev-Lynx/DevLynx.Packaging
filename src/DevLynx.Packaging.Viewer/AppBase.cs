@@ -8,7 +8,7 @@ namespace DevLynx.Packaging.Visualizer
 {
     internal class AppBase
     {
-        public const string PRODUCT_NAME = "Packaging XD";
+        public const string PRODUCT_NAME = "Packaging SimXD";
         public const string PRODUCT_VERSION = "1.0";
 
         #region Regions

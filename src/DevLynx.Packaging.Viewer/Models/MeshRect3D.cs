@@ -8,9 +8,9 @@ using System.Windows.Media.Media3D;
 
 namespace DevLynx.Packaging.Visualizer.Models
 {
-    internal static class MeshExtensions
+    internal static partial class MeshExtensions
     {
-        public static Point3D AddOffset(this Point3D pt, double x, double y, double z)
+        public static Point3D CreateOffset(this Point3D pt, double x, double y, double z)
         {
             return new Point3D(pt.X + x, pt.Y + y, pt.Z + z);
         }
@@ -97,56 +97,30 @@ namespace DevLynx.Packaging.Visualizer.Models
 
             if (width > 0 && height > 0)
             {
-                _p1 = p0.AddOffset(width, 0, 0);
-                _p2 = p0.AddOffset(width, height, 0);
-                _p3 = p0.AddOffset(0, height, 0);
+                _p1 = p0.CreateOffset(width, 0, 0);
+                _p2 = p0.CreateOffset(width, height, 0);
+                _p3 = p0.CreateOffset(0, height, 0);
             }
             else if (height > 0 && depth > 0)
             {
-                _p1 = p0.AddOffset(0, 0, depth);
-                _p2 = p0.AddOffset(0, height, depth);
-                _p3 = p0.AddOffset(0, height, 0);
+                _p1 = p0.CreateOffset(0, 0, depth);
+                _p2 = p0.CreateOffset(0, height, depth);
+                _p3 = p0.CreateOffset(0, height, 0);
             }
             else if (width > 0 && depth > 0)
             {
-                _p1 = p0.AddOffset(width, 0, 0);
-                _p2 = p0.AddOffset(width, 0, depth);
-                _p3 = p0.AddOffset(0, 0, depth);
+                _p1 = p0.CreateOffset(width, 0, 0);
+                _p2 = p0.CreateOffset(width, 0, depth);
+                _p3 = p0.CreateOffset(0, 0, depth);
             }
-
         }
 
-        //public MeshRect3D(double size) : this (new Point3D(), size, size, size) { }
-        //public MeshRect3D(Point3D centerPoint) : this (centerPoint, 1, 1, 1) { }
-        //public MeshRect3D(Point3D centerPoint, double width, double height, double depth)
-        //{
-        //    Point3D pt = centerPoint;
-
-        //    double x = Math.Abs(width / 2);
-        //    double y = Math.Abs(height / 2);
-        //    double z = Math.Abs(depth / 2);
-
-        //    if (width > 0 && height > 0)
-        //    {
-        //        _p0 = pt.AddOffset(-x, -y, 0);
-        //        _p1 = pt.AddOffset(x, -y, 0);
-        //        _p2 = pt.AddOffset(-x, y, 0);
-        //        _p3 = pt.AddOffset(x, y, 0);
-        //    }
-        //    else if (height > 0 && depth > 0)
-        //    {
-        //        _p0 = pt.AddOffset(0, -y, -z);
-        //        _p1 = pt.AddOffset(0, y, -z);
-        //        _p2 = pt.AddOffset(0, -y, z);
-        //        _p3 = pt.AddOffset(0, y, z);
-        //    }
-        //    else if (width > 0 && depth > 0)
-        //    {
-        //        _p0 = pt.AddOffset(-x, 0, -z);
-        //        _p1 = pt.AddOffset(x, 0, -z);
-        //        _p2 = pt.AddOffset(-x, 0, z);
-        //        _p3 = pt.AddOffset(x, 0, z);
-        //    }
-        //}
+        public MeshRect3D(Point3D p0, Point3D p1, Point3D p2, Point3D p3)
+        {
+            _p0 = p0;
+            _p1 = p1;
+            _p2 = p2;
+            _p3 = p3;
+        }
     }
 }

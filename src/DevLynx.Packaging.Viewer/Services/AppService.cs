@@ -72,7 +72,18 @@ namespace DevLynx.Packaging.Visualizer.Services
 
                     App.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        _packagingService.Context.Items.Add(new NDim(item));
+                        var items = _packagingService.Context.Items;
+
+                        foreach (var itm in items)
+                        {
+                            if (itm.Width == item.Width && itm.Height == item.Height && itm.Depth == item.Depth)
+                            {
+                                itm.Count++;
+                                return;
+                            }
+                        }
+
+                        items.Add(new NDim(item));
                     });
                     break;
             }
@@ -96,6 +107,7 @@ namespace DevLynx.Packaging.Visualizer.Services
             if (_dialog.IsShown) return;
 
             _dialog.Title = _dialog.Message = "";
+            
 
             switch (kind)
             {

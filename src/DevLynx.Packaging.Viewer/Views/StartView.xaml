@@ -6,6 +6,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:DevLynx.Packaging.Visualizer.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:nctx="clr-namespace:DevLynx.Packaging.Visualizer.Models.Contexts"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:rui="clr-namespace:DevLynx.Packaging.Visualizer.UI"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -28,7 +29,7 @@
                         HorizontalAlignment="Right"
                         Appearance="Info"
                         Command="{Binding VisualizeCommand}"
-                        Content="Visualize"
+                        Content="Simulate"
                         Icon="Eye48" />
                 </Border>
 
@@ -55,41 +56,47 @@
                     <StackPanel>
                         <Label Content="Width" />
 
-                        <ui:TextBox
+                        <ui:NumberBox
                             ClearButtonEnabled="False"
-                            PlaceholderText="Width (in)"
-                            Text="{Binding Context.Container.Width}">
+                            MaxDecimalPlaces="8"
+                            Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
+                            Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
+                            Text="{Binding Context.Container.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoFocusBehavior />
                                 <rui:AutoHighlightBehavior />
                             </i:Interaction.Behaviors>
-                        </ui:TextBox>
+                        </ui:NumberBox>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2">
                         <Label Content="Height" />
 
-                        <ui:TextBox
+                        <ui:NumberBox
                             ClearButtonEnabled="False"
-                            PlaceholderText="Height (in)"
-                            Text="{Binding Context.Container.Height}">
+                            MaxDecimalPlaces="8"
+                            Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
+                            Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
+                            Text="{Binding Context.Container.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoHighlightBehavior />
                             </i:Interaction.Behaviors>
-                        </ui:TextBox>
+                        </ui:NumberBox>
                     </StackPanel>
 
                     <StackPanel Grid.Column="4">
-                        <Label Content="Depth" />
+                        <Label Content="Length" />
 
-                        <ui:TextBox
+                        <ui:NumberBox
                             ClearButtonEnabled="False"
-                            PlaceholderText="Depth (in)"
-                            Text="{Binding Context.Container.Depth}">
+                            MaxDecimalPlaces="8"
+                            Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
+                            Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
+                            Text="{Binding Context.Container.Depth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoHighlightBehavior />
                             </i:Interaction.Behaviors>
-                        </ui:TextBox>
+                        </ui:NumberBox>
                     </StackPanel>
                 </Grid>
 
@@ -107,11 +114,11 @@
 
                 <Grid HorizontalAlignment="Stretch">
                     <DataGrid
+                        Name="_datagrid"
                         AutoGenerateColumns="False"
                         ItemsSource="{Binding Context.Items}"
                         SelectionMode="Single"
                         SelectionUnit="CellOrRowHeader"
-                        Name="_datagrid"
                         Style="{DynamicResource MaterialDesignDataGrid}"
                         Visibility="{Binding Context.Items.Count, Converter={StaticResource NotZeroConverter}}">
                         <DataGrid.Resources>
@@ -143,17 +150,17 @@
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding Width, StringFormat=N2}"
-                                Header="Width (in)"
+                                Header="Width"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding Height, StringFormat=N2}"
-                                Header="Height (in)"
+                                Header="Height"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding Depth, StringFormat=N2}"
-                                Header="Depth (in)"
+                                Header="Length"
                                 IsReadOnly="True" />
                             <DataGridTemplateColumn Header="Amount">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -165,10 +172,13 @@
                             <DataGridTemplateColumn Header="Actions">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ui:Button Icon="Delete48" Appearance="Danger" Foreground="#fff" HorizontalAlignment="Center"
-                                                   Command="{Binding ElementName=_datagrid, Path=DataContext.RemoveCommand}"
-                                                   CommandParameter="{Binding}"
-                                                   />
+                                        <ui:Button
+                                            HorizontalAlignment="Center"
+                                            Appearance="Danger"
+                                            Command="{Binding ElementName=_datagrid, Path=DataContext.RemoveCommand}"
+                                            CommandParameter="{Binding}"
+                                            Foreground="#fff"
+                                            Icon="Delete48" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

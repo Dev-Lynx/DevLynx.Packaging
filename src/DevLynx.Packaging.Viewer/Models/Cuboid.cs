@@ -34,7 +34,7 @@ namespace DevLynx.Packaging.Visualizer.Models
         }
     }
 
-    internal static class CuboidExtensions
+    internal static partial class MeshExtensions
     {
         public static void ModelCuboid(this Model3DGroup scene, Cuboid cuboid, Material material)
         {
@@ -48,10 +48,10 @@ namespace DevLynx.Packaging.Visualizer.Models
 
             MeshRect3D rect1 = new MeshRect3D(p0, w, h, 0);
             MeshRect3D rect2 = new MeshRect3D(p0, 0, h, d);
-            MeshRect3D rect3 = new MeshRect3D(p0.AddOffset(0, h, 0), w, 0, d);
+            MeshRect3D rect3 = new MeshRect3D(p0.CreateOffset(0, h, 0), w, 0, d);
 
-            MeshRect3D rect4 = new MeshRect3D(p0.AddOffset(0, 0, d), w, h, 0);
-            MeshRect3D rect5 = new MeshRect3D(p0.AddOffset(w, 0, 0), 0, h, d);
+            MeshRect3D rect4 = new MeshRect3D(p0.CreateOffset(0, 0, d), w, h, 0);
+            MeshRect3D rect5 = new MeshRect3D(p0.CreateOffset(w, 0, 0), 0, h, d);
             MeshRect3D rect6 = new MeshRect3D(p0, w, 0, d);
 
             model.ModelRect(rect1, material, material);

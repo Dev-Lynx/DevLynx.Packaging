@@ -39,6 +39,9 @@ namespace DevLynx.Packaging.Visualizer.Models.Contexts
 
     internal class PackageContext : BindableBase
     {
+        public static double MIN_DIM = 1;
+        public static double MAX_DIM = 700;
+
         public Dim Container { get; private set; } = new(10, 10, 10);
         public ObservableCollection<NDim> Items { get; } = new();
 

@@ -16,18 +16,18 @@
     Title="{Binding Source={x:Static app:AppBase.PRODUCT_NAME}}"
     Width="800"
     Height="800"
-   
     d:DataContext="{d:DesignInstance vm:ShellViewModel}"
     prism:ViewModelLocator.AutoWireViewModel="False"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
     mc:Ignorable="d">
     <Grid>
         <DockPanel>
             <ui:TitleBar
-                Title="PackageXD"
+                Title="{Binding Source={x:Static app:AppBase.PRODUCT_NAME}}"
                 DockPanel.Dock="Top"
                 ForceShutdown="False"
                 MinimizeToTray="False"
@@ -89,7 +89,7 @@
             </DockPanel>
         </DockPanel>
 
-        <ui:Dialog>
+        <ui:Dialog ButtonLeftAppearance="Info">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Loaded">
                     <prism:InvokeCommandAction Command="{Binding DialogLoadedCommand}" />

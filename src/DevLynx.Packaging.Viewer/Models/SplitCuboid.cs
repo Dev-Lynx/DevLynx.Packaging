@@ -43,6 +43,11 @@ namespace DevLynx.Packaging.Visualizer.Models
 
     internal static class SplitCuboidExtensions
     {
+        private enum CuboidPart
+        {
+            X, Y, Z
+        }
+
         public static void ModelSplitCuboid(this Model3DGroup scene, SplitCuboid cuboid, Material front, Material back)
         {
             Model3DGroup model = new Model3DGroup();
@@ -54,46 +59,49 @@ namespace DevLynx.Packaging.Visualizer.Models
             double d = cuboid.Depth;
             double th = cuboid.Thickness;
 
+            Cuboid c1 = new Cuboid(p0, th, h, d);
+            Cuboid c2 = new Cuboid(p0, w, th, d);
+            Cuboid c3 = new Cuboid(p0, w, h, th);
 
-            MeshRect3D rect1 = new MeshRect3D(p0, w, h + th, 0);
-            MeshRect3D rect2 = new MeshRect3D(p0, 0, h + th, d);
-            MeshRect3D rect3 = new MeshRect3D(p0.AddOffset(0, h, 0), w, 0, d);
+            model.ModelSplitCuboidPart(c2, front, back, CuboidPart.X);
+            model.ModelSplitCuboidPart(c1, front, back, CuboidPart.Y);
+            model.ModelSplitCuboidPart(c3, front, back, CuboidPart.Z);
+        }
 
-            MeshRect3D rect4 = new MeshRect3D(p0.AddOffset(0, h, d), w, th, 0);
-            MeshRect3D rect5 = new MeshRect3D(p0.AddOffset(w, h, 0), 0, th, d);
-            MeshRect3D rect6 = new MeshRect3D(p0.AddOffset(0, h + th, 0), w, 0, d);
+        private static void ModelSplitCuboidPart(this Model3DGroup scene, Cuboid cuboid, Material front, Material back, CuboidPart part)
+        {
+            Model3DGroup model = new Model3DGroup();
+            scene.Children.Add(model);
 
-            MeshRect3D rect7 = new MeshRect3D(p0.AddOffset(w, 0, -th), 0, h + th, th);
-            MeshRect3D rect8 = new MeshRect3D(p0.AddOffset(0, 0, -th), w, 0, th);
-            MeshRect3D rect9 = new MeshRect3D(p0.AddOffset(0, 0, -th), 0, h + th, th);
-            MeshRect3D rect10 = new MeshRect3D(p0.AddOffset(0, h + th, -th), w, 0, th);
-            MeshRect3D rect11 = new MeshRect3D(p0.AddOffset(0, 0, -th), w, h + th, 0);
+            Point3D p0 = cuboid.StartPoint;
+            double w = cuboid.Width;
+            double h = cuboid.Height;
+            double d = cuboid.Depth;
 
-            MeshRect3D rect12 = new MeshRect3D(p0.AddOffset(-th, 0, -th), th, 0, d + th);
-            MeshRect3D rect13 = new MeshRect3D(p0.AddOffset(-th, 0, -th), th, h + th, 0);
-            MeshRect3D rect14 = new MeshRect3D(p0.AddOffset(-th, h + th, -th), th, 0, d + th);
-            MeshRect3D rect15 = new MeshRect3D(p0.AddOffset(-th, 0, d), th, h + th, 0);
-            MeshRect3D rect16 = new MeshRect3D(p0.AddOffset(-th, 0, -th), 0, h + th, d + th);
+            MeshRect3D rect1 = new MeshRect3D(p0, w, h, 0);
+            MeshRect3D rect2 = new MeshRect3D(p0, 0, h, d);
+            MeshRect3D rect3 = new MeshRect3D(p0.CreateOffset(0, h, 0), w, 0, d);
 
-            model.ModelRect(rect1, front, back);
-            model.ModelRect(rect2, back, front);
-            model.ModelRect(rect3, front, back);
+            MeshRect3D rect4 = new MeshRect3D(p0.CreateOffset(0, 0, d), w, h, 0);
+            MeshRect3D rect5 = new MeshRect3D(p0.CreateOffset(w, 0, 0), 0, h, d);
+            MeshRect3D rect6 = new MeshRect3D(p0, w, 0, d);
 
-            model.ModelRect(rect4, back, front);
-            model.ModelRect(rect5, front, back);
-            model.ModelRect(rect6, front, back);
+            model.ModelRect(rect1, back, back);
+            model.ModelRect(rect2, back, back);
 
-            model.ModelRect(rect7, front, back);
-            model.ModelRect(rect8, back, front);
-            model.ModelRect(rect9, back, front);
-            model.ModelRect(rect10, front, back);
-            model.ModelRect(rect11, front, back);
+            if (part == CuboidPart.X)
+                model.ModelRect(rect3, back, front); // X Front 2
+            else
+                model.ModelRect(rect3, back, back); // X Front 2
 
-            model.ModelRect(rect12, back, front);
-            model.ModelRect(rect13, front, back);
-            model.ModelRect(rect14, front, back);
-            model.ModelRect(rect15, back, front);
-            model.ModelRect(rect16, back, front);
+            if (part == CuboidPart.Y)
+                model.ModelRect(rect5, back, front); // Y Front 2
+            else model.ModelRect(rect5, back, back); // Y Front 2
+
+            if (part == CuboidPart.Z)
+                model.ModelRect(rect4, front, back); // Z Front 1
+            else model.ModelRect(rect4, back, back); // Z Front 1
+            model.ModelRect(rect6, back, back);
         }
     }
 }
