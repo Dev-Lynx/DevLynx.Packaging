@@ -11,9 +11,10 @@
     xmlns:rui="clr-namespace:DevLynx.Packaging.Visualizer.UI"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vm="clr-namespace:DevLynx.Packaging.Visualizer.ViewModels"
-    d:DataContext="{d:DesignInstance vm:ShellViewModel}"
+    d:DataContext="{d:DesignInstance vm:ItemDialogViewModel}"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    prism:ViewModelLocator.AutoWireViewModel="True"
     mc:Ignorable="d">
     <Border Padding="30" d:Background="White">
         <DockPanel LastChildFill="False">
@@ -40,12 +41,17 @@
                     MaxDecimalPlaces="8"
                     Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                     Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                    PlaceholderText="Width"
-                    Text="{Binding PContext.NewItem.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                    Text="{Binding Context.NewItem.Width.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Behaviors>
                         <rui:AutoFocusBehavior />
                         <rui:AutoHighlightBehavior />
+                        <rui:MaintainSelectionBehavior />
                     </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <prism:InvokeCommandAction Command="{Binding KeyUpCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ui:NumberBox>
             </StackPanel>
 
@@ -57,11 +63,16 @@
                     MaxDecimalPlaces="8"
                     Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                     Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                    PlaceholderText="Height"
-                    Text="{Binding PContext.NewItem.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                    Text="{Binding Context.NewItem.Height.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Behaviors>
                         <rui:AutoHighlightBehavior />
+                        <rui:MaintainSelectionBehavior />
                     </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <prism:InvokeCommandAction Command="{Binding KeyUpCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ui:NumberBox>
             </StackPanel>
 
@@ -73,11 +84,16 @@
                     MaxDecimalPlaces="8"
                     Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                     Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                    PlaceholderText="Length"
-                    Text="{Binding PContext.NewItem.Depth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                    Text="{Binding Context.NewItem.Depth.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Behaviors>
                         <rui:AutoHighlightBehavior />
+                        <rui:MaintainSelectionBehavior />
                     </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <prism:InvokeCommandAction Command="{Binding KeyUpCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ui:NumberBox>
             </StackPanel>
         </DockPanel>

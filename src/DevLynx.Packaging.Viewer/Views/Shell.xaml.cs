@@ -32,8 +32,7 @@ namespace DevLynx.Packaging.Visualizer
             InitializeComponent();
 
             rgm.RegisterViewWithRegion<StartView>(AppBase.MAIN_REGION);
-            rgm.RegisterViewWithRegion<Space>(AppBase.MAIN_REGION);
-
+            rgm.RegisterViewWithRegion<SimView>(AppBase.MAIN_REGION);
         }
     }
 }

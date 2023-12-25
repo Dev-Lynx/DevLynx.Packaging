@@ -1,4 +1,5 @@
-﻿using DevLynx.Packaging.Visualizer.Models.Contexts;
+﻿using DevLynx.Packaging.Visualizer.Extensions;
+using DevLynx.Packaging.Visualizer.Models.Contexts;
 using DryIoc;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
@@ -17,6 +19,9 @@ namespace DevLynx.Packaging.Visualizer.Services
     public interface IAppService
     {
         RootContext Context { get; }
+
+        event EventHandler DialogAccepted;
+        event EventHandler DialogRejected;
 
         void ShowDialog(DialogKind kind);
         void HideDialog();
@@ -30,6 +35,9 @@ namespace DevLynx.Packaging.Visualizer.Services
         private readonly IMessageService _messageService;
         private readonly IPackagingService _packagingService;
         private readonly IContainerProvider _containerProvider;
+
+        public event EventHandler DialogAccepted;
+        public event EventHandler DialogRejected;
 
         public AppService(IMessageService msgSvc, IPackagingService pSvc, IContainerProvider ioc)
         {
@@ -47,6 +55,7 @@ namespace DevLynx.Packaging.Visualizer.Services
 
             _dialog.Opened += (s, e) => Context.Dialog.IsActive = true;
             _dialog.Closed += (s, e) => Context.Dialog.IsActive = false;
+            
 
             _dialog.ButtonRightClick += HandleDialogCancel;
             _dialog.ButtonLeftClick += HandleDialogAccept;
@@ -54,46 +63,20 @@ namespace DevLynx.Packaging.Visualizer.Services
 
         private void HandleDialogAccept(object sender, RoutedEventArgs e)
         {
-            switch (Context.Dialog.Kind)
-            {
-                case DialogKind.Item:
-                    Dim item = _packagingService.Context.NewItem;
-
-                    bool valid = true;
-                    
-                    if (!(valid &= item.Width > 0))
-                        _messageService.NotifyError("Please specify a valid width");
-                    else if (!(valid &= item.Height > 0))
-                        _messageService.NotifyError("Please specify a valid height");
-                    else if (!(valid &= item.Depth > 0))
-                        _messageService.NotifyError("Please specify a valid depth");
-
-                    if (!valid) break;
-
-                    App.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        var items = _packagingService.Context.Items;
-
-                        foreach (var itm in items)
-                        {
-                            if (itm.Width == item.Width && itm.Height == item.Height && itm.Depth == item.Depth)
-                            {
-                                itm.Count++;
-                                return;
-                            }
-                        }
-
-                        items.Add(new NDim(item));
-                    });
-                    break;
-            }
-
             _dialog.Hide();
+            DialogAccepted.Invoke(sender, e);
+
+            //switch (Context.Dialog.Kind)
+            //{
+            //    case DialogKind.Item:
+
+            //        break;
+            //}
         }
 
         private void HandleDialogCancel(object sender, RoutedEventArgs e)
         {
-            _dialog.Hide();
+            HideDialog();
         }
 
         public void ShowDialog(DialogKind kind)
@@ -132,6 +115,7 @@ namespace DevLynx.Packaging.Visualizer.Services
 
             Application.Current.Dispatcher.BeginInvoke(() =>
             {
+                Context.Dialog.Kind = DialogKind.None;
                 _dialog?.Hide();
             });
         }

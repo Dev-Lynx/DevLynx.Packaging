@@ -84,7 +84,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 _messageService.NotifyError("Container dimensions are invalid, please input correct values and try again.");
             else
             {
-                _regionManager.NavigateToView<Space>(AppBase.MAIN_REGION);
+                _regionManager.NavigateToView<SimView>(AppBase.MAIN_REGION);
             }
         }
     }

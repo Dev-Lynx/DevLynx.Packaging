@@ -31,6 +31,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         public Transform3D ModelTransform { get; private set; }
 
         private readonly IPackagingService _packagingService;
+        private readonly IAppService _appService;
 
         private Point _lastPos;
         private Brush _texture;
@@ -41,10 +42,11 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         private Model3DGroup _model;
         private Model3DGroup _scene;
 
-        public SpaceViewModel(IPackagingService packagingService)
+        public SpaceViewModel(IPackagingService packagingService, IAppService appService)
         {
             _texture = (Brush)Application.Current.FindResource("CartonTextureBrush");
             _packagingService = packagingService;
+            _appService = appService;
 
             LoadedCommand = new DelegateCommand<object>(HandleLoaded);
         }
@@ -54,7 +56,10 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (obj is not RoutedEventArgs e) return;
             if (e.Source is not Viewport3D viewport) return;
 
+            var appContext = _appService.Context;
+
             _viewport = viewport;
+            appContext.Viewport = viewport;
             _viewport.MouseDown += HandleMouseDown;
             
             if (_viewport.Parent is FrameworkElement p)
@@ -76,9 +81,16 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 Transform = transform
             };
 
+            
             _scene.Children.Add(_model);
 
             PrepareScene();
+
+            Model3DGroup packedScene = new Model3DGroup();
+            _model.Children.Add(packedScene);
+
+            appContext.Scene = _model;
+            appContext.PackedScene = packedScene;
         }
 
         private void HandleMouseDown(object sender, MouseButtonEventArgs e)
@@ -241,6 +253,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (_viewport.Camera is PerspectiveCamera cam)
             {
                 //cam.FieldOfView = max;
+                cam.NearPlaneDistance = 0.01;
                 cam.FarPlaneDistance = max * 10;
                 cam.Position = new Point3D(0, 0, max);
                 cam.LookDirection = new Vector3D(0, 0, -hz);
@@ -249,7 +262,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             double avg = (con.Width + con.Height + con.Depth) / 3d;
             
 
-            SplitCuboid container = new SplitCuboid(con.Width, con.Height, con.Depth, avg * .05);
+            SplitCuboid container = new SplitCuboid(con.Width, con.Height, con.Depth, .5);
             Material material = new DiffuseMaterial(Brushes.White);
             
             DiffuseMaterial bMaterial = new DiffuseMaterial(_texture);

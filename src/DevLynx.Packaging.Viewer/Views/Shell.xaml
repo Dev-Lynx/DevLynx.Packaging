@@ -22,7 +22,6 @@
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
-    WindowState="Maximized"
     mc:Ignorable="d">
     <Grid>
         <DockPanel>
@@ -38,54 +37,6 @@
 
             <DockPanel>
                 <ContentControl prism:RegionManager.RegionName="{Binding Source={x:Static app:AppBase.MAIN_REGION}}" />
-                <!--<Border Padding="10" DockPanel.Dock="Bottom">
-                <Button Command="{Binding ResetCommand}" Content="Reset" />
-            </Border>-->
-
-                <!--<Border Background="#222">
-                -->
-                <!--<i:Interaction.Triggers>
-
-                <i:EventTrigger EventName="MouseUp">
-                    <prism:InvokeCommandAction Command="{Binding MouseUpCommand}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseMove">
-                    <prism:InvokeCommandAction Command="{Binding MouseDragCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>-->
-                <!--
-                <Viewport3D x:Name="_view">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Loaded">
-                            <prism:InvokeCommandAction Command="{Binding ModelLoadedCommand}" />
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseDown">
-                            <prism:InvokeCommandAction Command="{Binding MouseDownCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <Viewport3D.Camera>
-                -->
-                <!--<PerspectiveCamera
-                        x:Name="_cam"
-                        FarPlaneDistance="50"
-                        FieldOfView="45"
-                        LookDirection="0,0,-10"
-                        NearPlaneDistance="0"
-                        Position="0,0,5"
-                        UpDirection="0,1,0" />-->
-                <!--
-                        <PerspectiveCamera
-                            FarPlaneDistance="50"
-                            FieldOfView="45"
-                            LookDirection="0,0,-10"
-                            NearPlaneDistance="0"
-                            Position="0,0,5"
-                            UpDirection="0,1,0" />
-                    </Viewport3D.Camera>
-
-                    <ModelVisual3D />
-                </Viewport3D>
-            </Border>-->
             </DockPanel>
         </DockPanel>
 
@@ -101,7 +52,8 @@
                     <rui:DialogSelector>
                         <rui:DialogSelector.ItemDialogTemplate>
                             <DataTemplate>
-                                <controls:ViewResolver DataContext="{Binding ElementName=_rootWindow, Path=DataContext}" TargetView="{x:Type views:ItemDialog}" />
+                                <!--DataContext="{Binding ElementName=_rootWindow, Path=DataContext}"-->
+                                <controls:ViewResolver TargetView="{x:Type views:ItemDialog}" />
                             </DataTemplate>
                         </rui:DialogSelector.ItemDialogTemplate>
 

@@ -61,10 +61,11 @@
                             MaxDecimalPlaces="8"
                             Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                             Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                            Text="{Binding Context.Container.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                            Text="{Binding Context.Container.Width.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoFocusBehavior />
                                 <rui:AutoHighlightBehavior />
+                                <rui:MaintainSelectionBehavior />
                             </i:Interaction.Behaviors>
                         </ui:NumberBox>
                     </StackPanel>
@@ -77,9 +78,10 @@
                             MaxDecimalPlaces="8"
                             Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                             Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                            Text="{Binding Context.Container.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                            Text="{Binding Context.Container.Height.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoHighlightBehavior />
+                                <rui:MaintainSelectionBehavior />
                             </i:Interaction.Behaviors>
                         </ui:NumberBox>
                     </StackPanel>
@@ -92,9 +94,10 @@
                             MaxDecimalPlaces="8"
                             Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                             Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                            Text="{Binding Context.Container.Depth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                            Text="{Binding Context.Container.Depth.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoHighlightBehavior />
+                                <rui:MaintainSelectionBehavior />
                             </i:Interaction.Behaviors>
                         </ui:NumberBox>
                     </StackPanel>
@@ -165,7 +168,7 @@
                             <DataGridTemplateColumn Header="Amount">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ui:NumberBox ClearButtonEnabled="False" Text="{Binding Count, Mode=TwoWay}" />
+                                        <ui:NumberBox ClearButtonEnabled="False" Text="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

@@ -71,6 +71,7 @@ namespace DevLynx.Packaging
         private BinPackResult _res;
 
         public event EventHandler<PackedBox> BoxPacked;
+        public event EventHandler NewIteration;
 
 
         public BinPack(IEnumerable<PackItem> items, PackingContainer container)
@@ -251,6 +252,7 @@ namespace DevLynx.Packaging
             for (int i = 0; i < _layers.Count; i++)
             {
                 _iterations++;
+                if (NewIteration != null) NewIteration.Invoke(this, EventArgs.Empty);
 
                 layer = _layers[i];
                 layerThickness = layer.Dim;
@@ -337,8 +339,8 @@ namespace DevLynx.Packaging
             {
                 Cell smallZ = FindSmallestZCell();
 
-                int cboxi = (int)_cbox.W;
-                box = _boxes[cboxi];
+                
+                box = _boxes[(int)_cbox.W];
 
                 if (smallZ.IsSingle)
                 {
@@ -350,6 +352,7 @@ namespace DevLynx.Packaging
                     FindBox(lenx, layerThickness, _remP.Y, lpz, lpz);
 
                     res = ExamineLayer(ref layerThickness);
+                    box = _boxes[(int)_cbox.W];
 
                     if (res == LayerResult.Full) break;
                     else if (res == LayerResult.Evened) continue;
@@ -378,6 +381,7 @@ namespace DevLynx.Packaging
                     FindBox(lenx, layerThickness, _remP.Y, lenz, lpz);
 
                     res = ExamineLayer(ref layerThickness);
+                    box = _boxes[(int)_cbox.W];
 
                     if (res == LayerResult.Full) break;
                     else if (res == LayerResult.Evened) continue;
@@ -428,6 +432,7 @@ namespace DevLynx.Packaging
                     FindBox(lenx, layerThickness, _remP.Y, lenz, lpz);
 
                     res = ExamineLayer(ref layerThickness);
+                    box = _boxes[(int)_cbox.W];
 
                     if (res == LayerResult.Full) break;
                     else if (res == LayerResult.Evened) continue;
@@ -472,6 +477,7 @@ namespace DevLynx.Packaging
 
                     FindBox(lenx, layerThickness, _remP.Y, lenz, lpz);
                     res = ExamineLayer(ref layerThickness);
+                    box = _boxes[(int)_cbox.W];
 
                     if (res == LayerResult.Full) break;
                     else if (res == LayerResult.Evened) continue;
@@ -542,8 +548,10 @@ namespace DevLynx.Packaging
                     lenx = smallZ.CumX - smallZ.Prev.CumX;
                     lenz = smallZ.Prev.CumZ - smallZ.CumZ;
                     lpz = _remP.Z - smallZ.CumZ;
+                    
                     FindBox(lenx, layerThickness, _remP.Y, lenz, lpz);
                     res = ExamineLayer(ref layerThickness);
+                    box = _boxes[(int)_cbox.W];
 
                     if (res == LayerResult.Full) break;
                     else if (res == LayerResult.Evened) continue;
@@ -590,6 +598,8 @@ namespace DevLynx.Packaging
             Box box = _boxes[(int)_cbox.W];
             box.IsPacked = true;
             box.Pack = new Vector3(_cbox.X, _cbox.Y, _cbox.Z);
+
+            Console.WriteLine(_cbox);
 
             if (BoxPacked != null)
             {
