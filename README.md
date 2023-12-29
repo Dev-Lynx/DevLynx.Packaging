@@ -9,8 +9,16 @@ This libray includes an implementation of an algorithm developed by Erhan Baltac
 
 The original source code was uploaded by [Bill Knechtel](https://github.com/wknechtel/3d-bin-pack), this library contains a .NET port with further improvements and updates using modern development practices.
 
+## Visualization
+<img src="./res/sim.gif"  alt="logo">
+
+A simulator has been developed to depict the various iterations this library goes through to solve each problem. You can find the project [here](./src/DevLynx.Packaging.Visualizer).
+
+
+
+
 ## Goals: 
  - [x] Full port to .NET
+ - [x] Implement Visualizer (WPF, Blazor, .etc)
  - [ ] Add More Unit Tests
- - [ ] Implement Visualizer (WPF, Blazor, .etc)
  - [ ] Create Nuget Package

@@ -56,13 +56,18 @@ namespace DevLynx.Packaging
 
     public class IterationEventArgs : EventArgs
     {
-        public PackOrientation Orientation { get; }
-        public Vector3 Point { get; }
+        public int Index { get; }
+        public Vector3 Container { get; }
 
-        public IterationEventArgs(PackOrientation orientation, Vector3 pt)
+        public float PackedVolume { get; init; }
+        public bool IsFit { get; init; }
+
+        public int TotalPacked { get; init; }
+
+        public IterationEventArgs(int index, Vector3 container)
         {
-            Orientation = orientation;
-            Point = pt;
+            Index = index;
+            Container = container;
         }
     }
     #endregion
@@ -95,8 +100,7 @@ namespace DevLynx.Packaging
         private BinPackResult _res;
 
         public event EventHandler<PackedBox> BoxPacked;
-        public event EventHandler<IterationEventArgs> NewIteration;
-
+        public event EventHandler<IterationEventArgs> IterationComplete;
 
         public BinPack(IEnumerable<PackItem> items, PackingContainer container)
         {
@@ -260,7 +264,7 @@ namespace DevLynx.Packaging
                     }
 
                     // printf("Layer: [%d] Eval: %d Dim: %d\n", layerlistlen, layers[layerlistlen].layereval, layers[layerlistlen].layerdim);
-                    Console.WriteLine("Layer: [{0}]\tEval: {1}\tDim: {2}", _layers.Count, layer.Weight, layer.Dim);
+                    //Console.WriteLine("Layer: [{0}]\tEval: {1}\tDim: {2}", _layers.Count, layer.Weight, layer.Dim);
 
                     _layers.Add(layer);
 
@@ -278,35 +282,41 @@ namespace DevLynx.Packaging
 
             for (int i = 0; i < _layers.Count; i++)
             {
+                
+
+                
+
                 _iterations++;
-                if (NewIteration != null)
-                {
-                    PackOrientation po = PackOrientation.NORMAL;
-                    switch (_variant)
-                    {
-                        case 2:
-                            po = PackOrientation.Y_90;
-                            break;
 
-                        case 3:
-                            po = PackOrientation.YZ_90;
-                            break;
 
-                        case 4:
-                            po = PackOrientation.Z_90;
-                            break;
+                //if (NewIteration != null)
+                //{
+                //    PackOrientation po = PackOrientation.NORMAL;
+                //    switch (_variant)
+                //    {
+                //        case 2:
+                //            po = PackOrientation.Y_90;
+                //            break;
 
-                        case 5:
-                            po = PackOrientation.X_90;
-                            break;
+                //        case 3:
+                //            po = PackOrientation.YZ_90;
+                //            break;
 
-                        case 6:
-                            po = PackOrientation.YX_90;
-                            break;
-                    }
+                //        case 4:
+                //            po = PackOrientation.Z_90;
+                //            break;
 
-                    NewIteration.Invoke(this, new IterationEventArgs(po, _pt));
-                }
+                //        case 5:
+                //            po = PackOrientation.X_90;
+                //            break;
+
+                //        case 6:
+                //            po = PackOrientation.YX_90;
+                //            break;
+                //    }
+
+                //    NewIteration.Invoke(this, new IterationEventArgs(po, _pt));
+                //}
 
                 layer = _layers[i];
                 layerThickness = layer.Dim;
@@ -358,6 +368,16 @@ namespace DevLynx.Packaging
                         break;
                 }
                 while (_active);
+
+                if (IterationComplete != null)
+                {
+                    IterationComplete.Invoke(this, new IterationEventArgs(_iterations, _pt)
+                    {
+                        PackedVolume = _packedVolume,
+                        TotalPacked = _totalPacked,
+                        IsFit = _totalPacked == _boxes.Count // Alternatively compare volumes
+                    });
+                }
             }
         }
 
@@ -653,7 +673,7 @@ namespace DevLynx.Packaging
             box.IsPacked = true;
             box.Pack = new Vector3(_cbox.X, _cbox.Y, _cbox.Z);
 
-            Console.WriteLine("Co: {0}\t\tPack: {1}", box.Co, box.Pack);
+            //Console.WriteLine("Co: {0}\t\tPack: {1}", box.Co, box.Pack);
 
             if (BoxPacked != null)
             {

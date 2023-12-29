@@ -1,0 +1,27 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:DevLynx.Packaging.Visualizer.UI.Controls"
+    xmlns:nui="clr-namespace:DevLynx.Packaging.Visualizer.UI">
+
+    <nui:MathConverter x:Key="ControlsMathConverter" />
+    <!--#region AxisIndicator-->
+    <!--  x:Key="AxisIndicatorStyle"  -->
+    <Style TargetType="{x:Type controls:AxisIndicator}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border>
+                        <Border
+                            BorderBrush="#fff"
+                            BorderThickness="2"
+                            CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ControlsMathConverter}, ConverterParameter=x/2}">
+                            <Viewport3D x:Name="PART_Viewport" />
+                        </Border>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--#endregion-->
+</ResourceDictionary>

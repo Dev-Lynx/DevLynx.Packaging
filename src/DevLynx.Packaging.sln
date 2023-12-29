@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging.Lab", "DevLynx.Packaging.Lab\DevLynx.Packaging.Lab.csproj", "{C27922BE-BB24-4985-A551-3ABB04A28863}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging.Visualizer", "DevLynx.Packaging.Viewer\DevLynx.Packaging.Visualizer.csproj", "{0E818ACA-D24D-4DAC-B5FA-AEFD51C29DF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevLynx.Packaging.Visualizer", "DevLynx.Packaging.Visualizer\DevLynx.Packaging.Visualizer.csproj", "{0E818ACA-D24D-4DAC-B5FA-AEFD51C29DF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
