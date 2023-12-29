@@ -43,6 +43,28 @@ namespace DevLynx.Packaging
             WasFullyPacked = TotalBoxes == TotalBoxesPacked;
         }
     }
+
+    public enum PackOrientation
+    {
+        NORMAL,
+        X_90,
+        Y_90,
+        Z_90,
+        YX_90,
+        YZ_90
+    }
+
+    public class IterationEventArgs : EventArgs
+    {
+        public PackOrientation Orientation { get; }
+        public Vector3 Point { get; }
+
+        public IterationEventArgs(PackOrientation orientation, Vector3 pt)
+        {
+            Orientation = orientation;
+            Point = pt;
+        }
+    }
     #endregion
 
     public partial class BinPack
@@ -61,6 +83,8 @@ namespace DevLynx.Packaging
         int _totalPacked;
         int _iterations;
 
+        int _variant;
+
         Cell _firstCell, _smallZ;
 
         private readonly List<Box> _boxes;
@@ -71,7 +95,7 @@ namespace DevLynx.Packaging
         private BinPackResult _res;
 
         public event EventHandler<PackedBox> BoxPacked;
-        public event EventHandler NewIteration;
+        public event EventHandler<IterationEventArgs> NewIteration;
 
 
         public BinPack(IEnumerable<PackItem> items, PackingContainer container)
@@ -114,9 +138,9 @@ namespace DevLynx.Packaging
 
             float x = _dim.X, y = _dim.Y, z = _dim.Z;
 
-            for (int variant = 1; variant <= 6 && _active; variant++)
+            for (_variant = 1; _variant <= 6 && _active; _variant++)
             {
-                switch (variant)
+                switch (_variant)
                 {
                     case 1:
                         _pt = new Vector3(x, y, z);
@@ -146,7 +170,7 @@ namespace DevLynx.Packaging
                 PrepareLayers();
                 EvaluateLayers();
 
-                if (x == y && y == z && variant == 1)
+                if (x == y && y == z && _variant == 1)
                     break;
             }
 
@@ -235,6 +259,9 @@ namespace DevLynx.Packaging
                         layer.Weight += dimDiff;
                     }
 
+                    // printf("Layer: [%d] Eval: %d Dim: %d\n", layerlistlen, layers[layerlistlen].layereval, layers[layerlistlen].layerdim);
+                    Console.WriteLine("Layer: [{0}]\tEval: {1}\tDim: {2}", _layers.Count, layer.Weight, layer.Dim);
+
                     _layers.Add(layer);
 
                 }
@@ -252,7 +279,34 @@ namespace DevLynx.Packaging
             for (int i = 0; i < _layers.Count; i++)
             {
                 _iterations++;
-                if (NewIteration != null) NewIteration.Invoke(this, EventArgs.Empty);
+                if (NewIteration != null)
+                {
+                    PackOrientation po = PackOrientation.NORMAL;
+                    switch (_variant)
+                    {
+                        case 2:
+                            po = PackOrientation.Y_90;
+                            break;
+
+                        case 3:
+                            po = PackOrientation.YZ_90;
+                            break;
+
+                        case 4:
+                            po = PackOrientation.Z_90;
+                            break;
+
+                        case 5:
+                            po = PackOrientation.X_90;
+                            break;
+
+                        case 6:
+                            po = PackOrientation.YX_90;
+                            break;
+                    }
+
+                    NewIteration.Invoke(this, new IterationEventArgs(po, _pt));
+                }
 
                 layer = _layers[i];
                 layerThickness = layer.Dim;
@@ -285,7 +339,7 @@ namespace DevLynx.Packaging
                         prepackedY = _packedY;
                         preRemPy = _remP.Y;
                         _remP.Y = layerThickness - _preLayer;
-                        _packedY -= layerThickness + _preLayer;
+                        _packedY = _packedY - layerThickness + _preLayer;
                         _remP.Z = _lilz;
                         layerThickness = _layerInLayer;
 
@@ -599,7 +653,7 @@ namespace DevLynx.Packaging
             box.IsPacked = true;
             box.Pack = new Vector3(_cbox.X, _cbox.Y, _cbox.Z);
 
-            Console.WriteLine(_cbox);
+            Console.WriteLine("Co: {0}\t\tPack: {1}", box.Co, box.Pack);
 
             if (BoxPacked != null)
             {

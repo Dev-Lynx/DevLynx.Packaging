@@ -36,7 +36,13 @@
                 UseSnapLayout="True" />
 
             <DockPanel>
-                <ContentControl prism:RegionManager.RegionName="{Binding Source={x:Static app:AppBase.MAIN_REGION}}" />
+                <ContentControl prism:RegionManager.RegionName="{Binding Source={x:Static app:AppBase.MAIN_REGION}}">
+                    <rui:ContentControlProps.ChangedAnimation>
+                        <Storyboard>
+                            <ThicknessAnimation To="0" From="30,0,-30,0" Duration="0:0:0.3" Storyboard.TargetProperty="Margin"/>
+                        </Storyboard>
+                    </rui:ContentControlProps.ChangedAnimation>
+                </ContentControl>
             </DockPanel>
         </DockPanel>
 

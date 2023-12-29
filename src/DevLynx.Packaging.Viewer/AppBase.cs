@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +11,19 @@ namespace DevLynx.Packaging.Visualizer
     {
         public const string PRODUCT_NAME = "Packaging SimXD";
         public const string PRODUCT_VERSION = "1.0";
+        
+        public const string AUTHOR = "Prince Owen";
+        public const string COMPANY = "Dev-Lynx Technologies";
+
+        public static readonly string BASE_DIR = Directory.GetCurrentDirectory();
+        public static readonly string WORK_DIR = Path.Combine(BASE_DIR, "App");
+        public readonly static string LOG_DIR = Path.Combine(WORK_DIR, "Logs");
 
         #region Regions
         public const string MAIN_REGION = nameof(MAIN_REGION);
         public const string SPACE_REGION = nameof(SPACE_REGION);
-        //public const string MENU_REGION = nameof(MENU_REGION);
         #endregion
+
+
     }
 }

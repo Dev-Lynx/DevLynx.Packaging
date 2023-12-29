@@ -1,11 +1,16 @@
 ﻿using DevLynx.Packaging.Visualizer.Extensions;
 using DevLynx.Packaging.Visualizer.Models;
+using DevLynx.Packaging.Visualizer.Models.Contexts;
 using DevLynx.Packaging.Visualizer.Services;
+using DevLynx.Packaging.Visualizer.UI;
+using NLog;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.DirectoryServices;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.Intrinsics;
@@ -32,23 +37,61 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
         private readonly IPackagingService _packagingService;
         private readonly IAppService _appService;
+        private readonly ILogger _logger;
 
         private Point _lastPos;
         private Brush _texture;
 
         private Viewport3D _viewport;
         private double _viewportMax;
-        
-        private Model3DGroup _model;
-        private Model3DGroup _scene;
 
-        public SpaceViewModel(IPackagingService packagingService, IAppService appService)
+
+        private Model3D _lModel;
+        private Model3DGroup _model;
+
+        private Model3DGroup _scene;
+        private Transform3D _rootTransform;
+        
+        private SolidAnimation _upAnim;
+        private SolidAnimation _downAnim;
+
+        private RootContext _context => _appService.Context;
+        private PackageContext _pcontext => _packagingService.Context;
+
+        public SpaceViewModel(IPackagingService packagingService, IAppService appService, ILogger logger)
         {
             _texture = (Brush)Application.Current.FindResource("CartonTextureBrush");
-            _packagingService = packagingService;
+
+            _logger = logger;
             _appService = appService;
+            _packagingService = packagingService;
+            
+            Duration duration = new Duration(TimeSpan.FromMilliseconds(400));
+            _upAnim = new SolidAnimation(new DoubleKeyFrameCollection
+            {
+                new EasingDoubleKeyFrame(0, KeyTime.FromPercent(0)),
+                new EasingDoubleKeyFrame(1.1, KeyTime.FromPercent(.6)),
+                new EasingDoubleKeyFrame(1, KeyTime.FromPercent(.8))
+            }, duration);
+
+            _downAnim = new SolidAnimation(new DoubleKeyFrameCollection
+            {
+                new EasingDoubleKeyFrame(1, KeyTime.FromPercent(0)),
+                new EasingDoubleKeyFrame(1.1, KeyTime.FromPercent(.2)),
+                new EasingDoubleKeyFrame(0, KeyTime.FromPercent(1))
+            }, duration);
 
             LoadedCommand = new DelegateCommand<object>(HandleLoaded);
+
+            _packagingService.Context.PropertyChanged += HandlePackageContextChanged;
+        }
+
+        private void HandlePackageContextChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PackageContext.SimContainer))
+            {
+                StartRender();
+            }
         }
 
         private void HandleLoaded(object obj)
@@ -56,41 +99,13 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (obj is not RoutedEventArgs e) return;
             if (e.Source is not Viewport3D viewport) return;
 
-            var appContext = _appService.Context;
-
-            _viewport = viewport;
-            appContext.Viewport = viewport;
-            _viewport.MouseDown += HandleMouseDown;
-            
-            if (_viewport.Parent is FrameworkElement p)
-                p.MouseWheel += HandleMouseWheel;
-            else _viewport.MouseWheel += HandleMouseWheel;
-
-            ModelVisual3D visual = new ModelVisual3D();
-            _viewport.Children.Add(visual);
-
-            visual.Content = _scene = new Model3DGroup();
-            
-            Transform3DGroup transform = new Transform3DGroup();
-            ModelTransform = transform;
-
-            transform.Children.Add(new RotateTransform3D(new QuaternionRotation3D(Quaternion.Identity)));
-
-            _model = new Model3DGroup()
+            if (_viewport == null)
             {
-                Transform = transform
-            };
+                _viewport = viewport;
+                _context.Viewport = viewport;
+            }
 
-            
-            _scene.Children.Add(_model);
-
-            PrepareScene();
-
-            Model3DGroup packedScene = new Model3DGroup();
-            _model.Children.Add(packedScene);
-
-            appContext.Scene = _model;
-            appContext.PackedScene = packedScene;
+            StartRender();
         }
 
         private void HandleMouseDown(object sender, MouseButtonEventArgs e)
@@ -108,10 +123,10 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         private void HandleDrag(object sender, MouseEventArgs e)
         {
             if (e.Source is not Viewport3D viewport) return;
-
-            Transform3DGroup group = _model.Transform as Transform3DGroup;
-            RotateTransform3D rot = (group.Children[0] as RotateTransform3D);
-            QuaternionRotation3D qrot = rot.Rotation as QuaternionRotation3D;
+            if (_model.Transform is not Transform3DGroup root) return;
+            if (root.Children.ElementAtOrDefault(0) is not Transform3DGroup group) return;
+            if (group.Children.ElementAtOrDefault(0) is not RotateTransform3D rot) return;
+            if (rot.Rotation is not QuaternionRotation3D qrot) return;
 
             Point pos = Mouse.GetPosition((IInputElement)viewport.Parent);
 
@@ -122,73 +137,33 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             dy *= sensitivity;
 
             Vector3D v = new Vector3D(0, dx, dy);
-            Quaternion qq = QuaternionExtensions.Euler(v) * qrot.Quaternion;
+            Quaternion qq = QuaternionExtensions.RadEulerRad(v) * qrot.Quaternion;
 
             qq.Normalize();
+
+            const double W_LOWER = .6;
+
+            const double X_LOWER = .025;
+            const double X_UPPER = .75;
+
+            const double Y_LOWER = -.075;
+            const double Y_UPPER = -.75;
+
+            const double Z_LOWER = .025;
+            const double Z_UPPER = .25;
+
+            if (qq.W < W_LOWER) qq.W = W_LOWER;
+
+            if (qq.X < X_LOWER) qq.X = X_LOWER;
+            else if (qq.X > X_UPPER) qq.X = X_UPPER;
+
+            if (qq.Y > Y_LOWER) qq.Y = Y_LOWER;
+            else if (qq.Y < Y_UPPER) qq.Y = Y_UPPER;
+
+            if (qq.Z < Z_LOWER) qq.Z = Z_LOWER;
+            else if (qq.Z > Z_UPPER) qq.Z = Z_UPPER;
+
             qrot.Quaternion = qq;
-        }
-
-        private void HandleDragOld(object sender, MouseEventArgs e)
-        {
-            if (e.Source is not Viewport3D viewport) return;
-
-            Point pos = Mouse.GetPosition((IInputElement)viewport.Parent);
-            
-
-            double dx = pos.X - _lastPos.X, dy = pos.Y - _lastPos.Y;
-            _lastPos = pos;
-
-            double mag = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
-
-            double theta = Math.Asin(dy / mag);
-
-            
-
-            Transform3DGroup group = _model.Transform as Transform3DGroup;
-            RotateTransform3D rot = (group.Children[0] as RotateTransform3D);
-
-            QuaternionRotation3D qrot = rot.Rotation as QuaternionRotation3D;
-
-            
-
-
-
-            Vector3D v1 = new Vector3D(dx, dy, 0);
-            v1.Normalize();
-            Vector3D v2 = QuaternionExtensions.ToEuler(qrot.Quaternion);
-            Vector3D v3 = new Vector3D(0, 0, 1);
-
-
-
-
-
-            Vector3D v = v1 + v2;
-            v.Normalize();
-
-            Vector3D v4 = Vector3D.CrossProduct(v1, v3);
-            double qw = Math.Sqrt(v1.LengthSquared * v3.LengthSquared) + Vector3D.DotProduct(v1, v3);
-            
-
-
-            double angle = Vector3D.DotProduct(v1, v3);
-            
-
-            v4.Normalize();
-            Quaternion q = new Quaternion(v4.X, v4.Y, v4.Z, qw);
-
-            Console.WriteLine(q);
-
-            try
-            {
-                v1.Normalize();
-                v.Normalize();
-                // qrot.Quaternion + 
-                q.Normalize();
-                Quaternion qq = qrot.Quaternion + q;//new Quaternion(v1, angle);
-                qq.Normalize();
-                qrot.Quaternion = qq;
-            }
-            catch { }
         }
 
         private void HandleDragComplete(object sender, MouseButtonEventArgs e)
@@ -212,57 +187,165 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 z = Math.Max(z, min);
                 z = Math.Min(z, max);
 
+                Console.WriteLine("ZZZ: {0}", z);
+
                 cam.Position = new Point3D(cam.Position.X, cam.Position.Y, z);
             }
             
         }
 
-        public void OnNavigatedTo(NavigationContext nctx)
+        private void StartRender()
         {
-            PrepareScene();
+            if (_model == null)
+            {
+                RenderScene(true);
+                return;
+            }
+
+            _pcontext.Rendering = true;
+            RenderScene(false);
+
+            if (_model.Transform is not Transform3DGroup rootTransform)
+                return;
+
+            if (rootTransform.Children.ElementAtOrDefault(1) is not ScaleTransform3D trans)
+                return;
+
+            if (_lModel is not Model3D m1) return;
+            if (m1.Transform is not Transform3DGroup g1) return;
+            if (g1.Children.ElementAtOrDefault(1) is not ScaleTransform3D s1) return;
+
+            if (_model is not Model3D m2) return;
+            if (m2.Transform is not Transform3DGroup g2) return;
+            if (g2.Children.ElementAtOrDefault(1) is not ScaleTransform3D s2) return;
+
+            _logger.Warn("[Render started] {0} {1}", _lModel.GetHashCode(), _model.GetHashCode());
+            var echo = s1
+                .BeginAnimation(_downAnim, SolidAnimationKind.Scale)
+                .ThenBegin(s2, _upAnim, SolidAnimationKind.Scale)
+                .Then(() =>
+                {
+                    _logger.Warn("[Animation complete] {0}", s2.ScaleX);
+                    _scene.Children.Remove(m1);
+                    _pcontext.Rendering = false;
+                });
         }
 
-        private void PrepareScene()
+        private void RenderScene(bool initial)
+        {
+            var appContext = _appService.Context;
+
+            if (initial)
+            {
+                _viewport.MouseDown += HandleMouseDown;
+
+                if (_viewport.Parent is FrameworkElement p)
+                    p.MouseWheel += HandleMouseWheel;
+                else _viewport.MouseWheel += HandleMouseWheel;
+
+                ModelVisual3D visual = new ModelVisual3D();
+                _viewport.Children.Add(visual);
+
+                visual.Content = _scene = new Model3DGroup();
+
+                
+
+                Transform3DGroup transform = new Transform3DGroup();
+                ModelTransform = transform;
+
+                transform.Children.Add(new RotateTransform3D(new QuaternionRotation3D(Quaternion.Identity)));
+
+                //Transform3DGroup rootTransform = new Transform3DGroup();
+                //rootTransform.Children.Add(transform);
+                //rootTransform.Children.Add(new ScaleTransform3D(0, 0, 0));
+
+                //_rootTransform = rootTransform;
+
+            }
+
+            Transform3DGroup rootTransform = new Transform3DGroup();
+            rootTransform.Children.Add(ModelTransform);
+            rootTransform.Children.Add(new ScaleTransform3D(0, 0, 0));
+
+            _rootTransform = rootTransform;
+
+            _lModel = _model;
+
+            //_scene.Children.Clear();
+            _model = new Model3DGroup()
+            {
+                Transform = _rootTransform
+            };
+            _scene.Children.Add(_model);
+
+
+            PrepareScene(initial);
+
+            Model3DGroup packedScene = new Model3DGroup();
+            _model.Children.Add(packedScene);
+
+            appContext.Scene = _model;
+            appContext.PackedScene = packedScene;
+        }
+
+        private void PrepareScene(bool initial)
         {
             if (_scene == null) return;
 
             double viewRatio = .25;
 
-            var con = _packagingService.Context.Container;
+            
+            var con = _packagingService.Context.SimContainer;
+            if (con == Vector3.Zero)
+                con = new Vector3(_packagingService.Context.Container.Width, _packagingService.Context.Container.Height, _packagingService.Context.Container.Depth);
 
-            double w = con.Width * viewRatio;
-            double h = con.Height * viewRatio;
-            double d = con.Depth * viewRatio;
+            double w = con.X * viewRatio;
+            double h = con.Y * viewRatio;
+            double d = con.Z * viewRatio;
 
             double hw = w / 2;
             double hy = h / 2;
             double hz = d / 2;
 
-            double fw = w + con.Width;
-            double fh = h + con.Height;
-            double fz = d + con.Depth;
+            double fw = w + con.X;
+            double fh = h + con.Y;
+            double fz = d + con.Z;
 
             Vector3D direction = new Point3D() - new Point3D(-w, hy, 0.0);
 
-            _scene.Children.Add(new DirectionalLight(Colors.Gray, direction));
-            _scene.Children.Add(new AmbientLight(Colors.Gray));
+            if (initial)
+            {
+                _scene.Children.Add(new DirectionalLight(Colors.Gray, direction));
+                _scene.Children.Add(new AmbientLight(Colors.Gray));
+            }
+            
 
             double max = Math.Max(fw, fh);
             _viewportMax = max = Math.Max(max, fz);
+            
+            //_viewportMax = fz;
 
+            double avg = (con.X + con.Y + con.Z) / 3d;
+            _viewportMax = avg;
             if (_viewport.Camera is PerspectiveCamera cam)
             {
-                //cam.FieldOfView = max;
-                cam.NearPlaneDistance = 0.01;
-                cam.FarPlaneDistance = max * 10;
-                cam.Position = new Point3D(0, 0, max);
-                cam.LookDirection = new Vector3D(0, 0, -hz);
+                if (initial)
+                {
+                    //cam.FieldOfView = max;
+                    cam.NearPlaneDistance = 0.01;
+                    //cam.FarPlaneDistance = max * 10;
+                    //cam.Position = new Point3D(0, 0, max / 2);
+                    cam.FarPlaneDistance = max * 10;
+                    cam.Position = new Point3D(0, 0, max * .7);
+                    cam.LookDirection = new Vector3D(0, 0, -hz);
+                }
+                
             }
 
-            double avg = (con.Width + con.Height + con.Depth) / 3d;
-            
+            double thickness = avg * .02;
+            _packagingService.Context.ContainerThickness = thickness;
 
-            SplitCuboid container = new SplitCuboid(con.Width, con.Height, con.Depth, .5);
+            SplitCuboid container = new SplitCuboid(con.X, con.Y, con.Z, thickness);
             Material material = new DiffuseMaterial(Brushes.White);
             
             DiffuseMaterial bMaterial = new DiffuseMaterial(_texture);
@@ -274,6 +357,10 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
+
+        public void OnNavigatedTo(NavigationContext nctx)
+        {
+        }
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {

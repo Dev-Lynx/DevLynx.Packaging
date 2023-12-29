@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
@@ -12,6 +13,18 @@ namespace DevLynx.Packaging.Visualizer.Extensions
         public static Quaternion Euler(Vector3D v) => Euler(v.X, v.Y, v.Z);
 
         public static Quaternion Euler(double yaw, double pitch, double roll)
+        {
+            // Convert degrees to radians
+            yaw = yaw * Math.PI / 180;
+            pitch = pitch * Math.PI / 180;
+            roll = roll * Math.PI / 180;
+
+            return RadEulerRad(yaw, pitch, roll);
+        }
+
+        public static Quaternion RadEulerRad(Vector3D v) => RadEulerRad(v.X, v.Y, v.Z);
+
+        public static Quaternion RadEulerRad(double yaw, double pitch, double roll)
         {
             yaw /= 2;
             pitch /= 2;
@@ -60,6 +73,50 @@ namespace DevLynx.Packaging.Visualizer.Extensions
             v.Z = Math.Atan2(t3, t4);
 
             return v;
+        }
+
+        private static Quaternion Norm(this Quaternion q)
+        {
+            q.Normalize();
+            return q;
+        }
+
+        //private static Lazy<Quaternion> X_90 = new Lazy<Quaternion>(() => Euler(0, 0, 90).Norm());
+        private static Lazy<Quaternion> X_90 = new Lazy<Quaternion>(() => (new Quaternion(0, 0.7071, 0.7071, 0)).Norm());
+        private static Lazy<Quaternion> Y_90 = new Lazy<Quaternion>(() => Euler(0, 90, 0).Norm());
+        private static Lazy<Quaternion> Y_INV_90 = new Lazy<Quaternion>(() => Euler(0, -90, 0).Norm());
+        //private static Lazy<Quaternion> Z_90 = new Lazy<Quaternion>(() => Euler(270, 0,0).Norm());
+
+        //private static Lazy<Quaternion> Z_90 = new Lazy<Quaternion>(() => Euler(-90, 180, -180).Norm());
+        private static Lazy<Quaternion> Z_90 = new Lazy<Quaternion>(() => Euler(90, 180, -180).Norm());
+
+        //private static Lazy<Quaternion> YX_90 = new Lazy<Quaternion>(() => (Z_90.Value * Y_90.Value).Norm());
+        // Euler(90, 0, 90)
+        /*
+         * w = 0.5
+x = -0.5
+y = 0.5
+z = -0.5
+        */
+        private static Lazy<Quaternion> YX_90 = new Lazy<Quaternion>(() => (Euler(0, 0, 90) * Y_90.Value).Norm());
+        private static Lazy<Quaternion> YZ_90 = new Lazy<Quaternion>(() => (new Quaternion(-.5, -.5, -.5, .5)).Norm());
+
+        public static Quaternion FromOrientation(PackOrientation orientation)
+        {
+            switch (orientation)
+            {
+                default: return Quaternion.Identity;
+
+                case PackOrientation.X_90: return X_90.Value;
+
+                case PackOrientation.Y_90: return Y_INV_90.Value;
+
+                case PackOrientation.Z_90: return Z_90.Value;
+
+                case PackOrientation.YX_90: return YX_90.Value;
+
+                case PackOrientation.YZ_90: return YZ_90.Value;
+            }
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Accessibility;
 using DevLynx.Packaging.Visualizer.Extensions;
+using DryIoc;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
+using Quaternion = System.Windows.Media.Media3D.Quaternion;
 
 namespace DevLynx.Packaging.Visualizer.Models.Contexts
 {
@@ -56,15 +59,79 @@ namespace DevLynx.Packaging.Visualizer.Models.Contexts
     internal class PackIteration : BindableBase
     {
         public int Id { get; }
-        public DateTime CreatedAt { get; } = DateTime.Now;
+        public DateTime StartedAt { get; } = DateTime.Now;
+        public DateTime StopedAt { get; set; }
 
-        public TimeSpan Duration { get; set; }
+        public TimeSpan Duration => StopedAt - StartedAt;
 
         public List<PackInstance> Instances { get; } = new List<PackInstance>();
 
-        public PackIteration(int id)
+        public double PackedVolume => _vol;
+        private double _vol;
+
+        private readonly PackOrientation _orient;
+        private readonly Transform3D _transform;
+
+        public Quaternion Quaternion { get; set; }
+        public Transform3D Transform => _transform;
+        public PackOrientation Orientation => _orient;
+        public Vector3 Container { get; }
+
+        public PackIteration(int id, Vector3 container, PackOrientation orientation = PackOrientation.NORMAL)
         {
             Id = id;
+            Container = container;
+            _orient = orientation;
+
+            var q = QuaternionExtensions.FromOrientation(orientation);
+            q.Normalize();
+
+            Quaternion = q;
+            _transform = new RotateTransform3D(new QuaternionRotation3D(q));
+        }
+
+        public void AddInstance(PackInstance instance)
+        {
+            _vol +=  instance.Dim.X * instance.Dim.Y * instance.Dim.Z;
+            RaisePropertyChanged(nameof(PackedVolume));
+
+            var co = instance.Co;
+            var dim = instance.Dim;
+
+            var pt = _transform.Transform(new Point3D(co.X, co.Y, co.Z));
+            var v = _transform.Transform(new Vector3D(dim.X, dim.Y, dim.Z));
+
+
+
+            Console.WriteLine("{0}: {1}", instance.Id, _orient);
+
+
+            //instance.Co = new Vector3((float)pt.X, (float)pt.Y, (float)pt.Z);
+            //instance.Co = co;
+            //instance.Dim = new Vector3((float)v.X, (float)v.Y, (float)v.Z);
+
+            //var dim = instance.Dim;
+
+            //switch (_orient)
+            //{
+            //    case PackOrientation.X_90:
+            //        instance.Dim = new Vector3(dim.X, dim.Z, dim.Y);
+            //        break;
+            //    case PackOrientation.Y_90:
+            //        instance.Dim = new Vector3(dim.Z, dim.Y, dim.X);
+            //        break;
+            //    case PackOrientation.Z_90:
+            //        instance.Dim = new Vector3(dim.Y, dim.X, dim.Z);
+            //        break;
+            //    case PackOrientation.YX_90:
+            //        instance.Dim = new Vector3(dim.Y, dim.Z, dim.X);
+            //        break;
+            //    case PackOrientation.YZ_90:
+            //        instance.Dim = new Vector3(dim.Z, dim.X, dim.Y);
+            //        break;
+            //}
+
+            Instances.Add(instance);
         }
     }
 
@@ -73,16 +140,19 @@ namespace DevLynx.Packaging.Visualizer.Models.Contexts
         public int Id { get; }
         public DateTime PackedAt { get; } = DateTime.Now;
         
-        public Vector3 Dim => Box.Dimensions;
-        public Vector3 Co => Box.Coordinates;
+        public Vector3 Dim { get; set; }
+        public Vector3 Co { get; set; }
         public PackedBox Box { get; set; }
 
         public string Color { get; set; }
         public Model3D Model { get; set; }
 
-        public PackInstance(int id)
+        public PackInstance(int id, PackedBox box)
         {
             Id = id;
+            Box = box;
+            Co = box.Coordinates;
+            Dim = box.Dimensions;
         }
     }
 
@@ -91,10 +161,17 @@ namespace DevLynx.Packaging.Visualizer.Models.Contexts
         public static double MIN_DIM = 1;
         public static double MAX_DIM = 700;
 
+        
         public Dim Container { get; private set; } = new(10, 10, 10);
+        public Vector3 SimContainer { get; internal set; }
+        public double ContainerThickness { get; internal set; }
+
         public ObservableCollection<NDim> Items { get; } = new();
 
         public Dim NewItem { get; set; } = new(1, 1, 1);
+
+        public bool Rendering { get; set; }
+
 
         public ObservableCollection<PackIteration> Iterations { get; } = new();
         public BinPackResult Result { get; set; }

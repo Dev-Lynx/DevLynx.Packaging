@@ -54,10 +54,11 @@ namespace DevLynx.Packaging.Visualizer.Models
             scene.Children.Add(model);
 
             Point3D p0 = cuboid.StartPoint;
-            double w = cuboid.Width;
-            double h = cuboid.Height;
-            double d = cuboid.Depth;
             double th = cuboid.Thickness;
+            double w = cuboid.Width + th;
+            double h = cuboid.Height + th;
+            double d = cuboid.Depth + th;
+            
 
             Cuboid c1 = new Cuboid(p0, th, h, d);
             Cuboid c2 = new Cuboid(p0, w, th, d);

@@ -1,11 +1,14 @@
 ﻿using DevLynx.Packaging.Models;
+using DevLynx.Packaging.Visualizer.Extensions;
 using DevLynx.Packaging.Visualizer.Models.Contexts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Media3D;
 
 namespace DevLynx.Packaging.Visualizer.Services
 {
@@ -26,7 +29,7 @@ namespace DevLynx.Packaging.Visualizer.Services
             "#4ebeee", // Light Blue
             "#202020", // Dark Gray
             "#02ad61", // Jade
-            "#cd2b28", // Red
+            //"#cd2b28", // Red
             "#4e255f", // Dark Purple
             "#00a6a2", // Dark Teal
             "#ff7c00", // Orange
@@ -40,6 +43,25 @@ namespace DevLynx.Packaging.Visualizer.Services
 
         public PackagingService()
         {
+            // TODO: Set the container to LazySingle
+            Context.Container.Width = 40;
+            Context.Container.Height = 50;
+            Context.Container.Depth = 30;
+
+            Context.Items.Add(new NDim(20, 40, 10)
+            {
+                Count = 5
+            });
+
+            Context.Items.Add(new NDim(20, 20, 20)
+            {
+                Count = 3
+            });
+
+            Context.Items.Add(new NDim(40, 60, 30)
+            {
+                Count = 2
+            });
         }
 
         public void Start()
@@ -70,10 +92,19 @@ namespace DevLynx.Packaging.Visualizer.Services
             });
         }
 
-        private void HandleNewIteration(object sender, EventArgs e)
+        private void HandleNewIteration(object sender, IterationEventArgs e)
         {
-            _itr = new PackIteration(_iterations.Count);
+            var cnt = Context.Container;
+            
+            _itr = new PackIteration(_iterations.Count, new Vector3(e.Point.X, e.Point.Y, e.Point.Z), e.Orientation);
             _iterations.Add(_itr);
+
+            Console.WriteLine("Iteration: [{0}] {1}", _iterations.Count, e.Point);
+            
+
+            //var q = QuaternionExtensions.FromOrientation(po);
+
+
         }
 
         private void HandlePack(object sender, PackedBox box)
@@ -81,11 +112,8 @@ namespace DevLynx.Packaging.Visualizer.Services
             int id = _itr.Instances.Count;
             int nColor = _itr.Instances.Count % _colors.Count;
 
-            Console.WriteLine("New Box Packed {0} {1} {2}", nColor, box.Dimensions, box.Coordinates);
-
-            _itr.Instances.Add(new PackInstance(id)
+            _itr.AddInstance(new PackInstance(id, box)
             {
-                Box = box,
                 Color = _colors[nColor]
             });
         }
