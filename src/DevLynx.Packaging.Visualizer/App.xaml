@@ -29,6 +29,7 @@
 
             <!--#region Illustrations-->
             <BitmapImage x:Key="EastwoodNoComments" UriSource="/UI/Assets/illustrations/eastwood/eastwood-no-comments.png" />
+            <BitmapImage x:Key="EastwoodFatalError" UriSource="/UI/Assets/illustrations/eastwood/eastwood-fatal-error.png" />
             <!--#endregion-->
 
             <!--#region Converters-->

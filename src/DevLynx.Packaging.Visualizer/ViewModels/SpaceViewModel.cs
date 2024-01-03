@@ -58,6 +58,9 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         private RootContext _context => _appService.Context;
         private PackageContext _pcontext => _packagingService.Context;
 
+        private bool _canRender;
+        private bool _isFresh;
+
         public SpaceViewModel(IPackagingService packagingService, IAppService appService, ILogger logger)
         {
             _texture = (Brush)Application.Current.FindResource("CartonTextureBrush");
@@ -84,6 +87,19 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             LoadedCommand = new DelegateCommand<object>(HandleLoaded);
 
             _packagingService.Context.PropertyChanged += HandlePackageContextChanged;
+            _packagingService.PackComplete += HandlePackComplete;
+        }
+
+        private void HandlePackComplete(object sender, EventArgs e)
+        {
+            _isFresh = true;
+            if (_viewport == null)
+            {
+                _canRender = true;
+                return;
+            }
+
+            Application.Current.Dispatcher.BeginInvoke(StartRender);
         }
 
         private void HandlePackageContextChanged(object sender, PropertyChangedEventArgs e)
@@ -105,7 +121,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 _context.Viewport = viewport;
             }
 
-            StartRender();
+            if (_canRender) StartRender();
         }
 
         private void HandleMouseDown(object sender, MouseButtonEventArgs e)
@@ -204,6 +220,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
             _pcontext.Rendering = true;
             RenderScene(false);
+            _isFresh = false;
 
             if (_model.Transform is not Transform3DGroup rootTransform)
                 return;
@@ -220,6 +237,8 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (g2.Children.ElementAtOrDefault(1) is not ScaleTransform3D s2) return;
 
             _logger.Warn("[Render started] {0} {1}", _lModel.GetHashCode(), _model.GetHashCode());
+
+
             var echo = s1
                 .BeginAnimation(_downAnim, SolidAnimationKind.Scale)
                 .ThenBegin(s2, _upAnim, SolidAnimationKind.Scale)
@@ -229,6 +248,18 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                     _scene.Children.Remove(m1);
                     _pcontext.Rendering = false;
                 });
+
+            /*
+             var echo = s2.BeginAnimation(_upAnim, SolidAnimationKind.Scale)
+                //.BeginAnimation(_downAnim, SolidAnimationKind.Scale)
+                //.ThenBegin(s2, _upAnim, SolidAnimationKind.Scale)
+                .Then(() =>
+                {
+                    _logger.Warn("[Animation complete] {0}", s2.ScaleX);
+                    _scene.Children.Remove(m1);
+                    _pcontext.Rendering = false;
+                });
+             */
         }
 
         private void RenderScene(bool initial)
@@ -299,6 +330,8 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (con == Vector3.Zero)
                 con = new Vector3(_packagingService.Context.Container.Width, _packagingService.Context.Container.Height, _packagingService.Context.Container.Depth);
 
+            _logger.Warn("Container: {0}", con);
+
             double w = con.X * viewRatio;
             double h = con.Y * viewRatio;
             double d = con.Z * viewRatio;
@@ -329,7 +362,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             _viewportMax = avg;
             if (_viewport.Camera is PerspectiveCamera cam)
             {
-                if (initial)
+                if (_isFresh)
                 {
                     //cam.FieldOfView = max;
                     cam.NearPlaneDistance = 0.01;

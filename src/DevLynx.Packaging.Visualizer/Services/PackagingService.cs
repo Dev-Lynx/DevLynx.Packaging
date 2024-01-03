@@ -16,6 +16,7 @@ namespace DevLynx.Packaging.Visualizer.Services
     internal interface IPackagingService
     {
         internal PackageContext Context { get; }
+        event EventHandler PackComplete;
 
         void Start();
     }
@@ -23,6 +24,7 @@ namespace DevLynx.Packaging.Visualizer.Services
     internal class PackagingService : IPackagingService
     {
         public PackageContext Context { get; } = new();
+        public event EventHandler PackComplete;
 
         private readonly List<string> _colors = new List<string>()
         {
@@ -30,7 +32,6 @@ namespace DevLynx.Packaging.Visualizer.Services
             "#4ebeee", // Light Blue
             "#202020", // Dark Gray
             "#02ad61", // Jade
-            "#cd2b28", // Red
             "#4e255f", // Dark Purple
             "#00a6a2", // Dark Teal
             "#ff7c00", // Orange
@@ -39,31 +40,30 @@ namespace DevLynx.Packaging.Visualizer.Services
             "#662e1d", // Cinnamon (Brown)
         };
 
-        private PackIteration _itr;
         private readonly List<PackIteration> _iterations = new();
         private readonly List<PackInstance> _instances = new();
 
         public PackagingService()
         {
             // TODO: Set the container to LazySingle
-            Context.Container.Width = 40;
-            Context.Container.Height = 50;
-            Context.Container.Depth = 30;
+            //Context.Container.Width = 40;
+            //Context.Container.Height = 50;
+            //Context.Container.Depth = 30;
 
-            Context.Items.Add(new NDim(20, 40, 10)
-            {
-                Count = 5
-            });
+            //Context.Items.Add(new NDim(20, 40, 10)
+            //{
+            //    Count = 5
+            //});
 
-            Context.Items.Add(new NDim(20, 20, 20)
-            {
-                Count = 3
-            });
+            //Context.Items.Add(new NDim(20, 20, 20)
+            //{
+            //    Count = 3
+            //});
 
-            Context.Items.Add(new NDim(40, 60, 30)
-            {
-                Count = 2
-            });
+            //Context.Items.Add(new NDim(40, 60, 30)
+            //{
+            //    Count = 2
+            //});
         }
 
         public void Start()
@@ -88,7 +88,7 @@ namespace DevLynx.Packaging.Visualizer.Services
             ctx.ContainerVolume = ctx.Container.Width * ctx.Container.Height * ctx.Container.Depth;
 
             int bestItr = -1;
-            double bestVol = 0;
+            double bestVol = -1;
             for (int i = 0; i < _iterations.Count; i++)
             {
                 double vol = _iterations[i].Volume;
@@ -100,21 +100,27 @@ namespace DevLynx.Packaging.Visualizer.Services
                 }
             }
 
-            if (bestItr > 0)
-            {
-                _iterations[bestItr].IsBest = true;
-                ctx.BestIteration = bestItr;
+            
 
-                Console.WriteLine("Best is: {0}", bestItr);
+            if (bestItr >= 0)
+                _iterations[bestItr].IsBest = true;
+
+
+            ctx.BestIteration = bestItr;
+            Console.WriteLine("Best is: {0}", bestItr);
+
+            if (_iterations.Count > 0)
+            {
+                Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    for (int i = 0; i < _iterations.Count; i++)
+                    {
+                        ctx.Iterations.Add(_iterations[i]);
+                    }
+                });
             }
 
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                for (int i = 0; i < _iterations.Count; i++)
-                {
-                    ctx.Iterations.Add(_iterations[i]);
-                }
-            });
+            PackComplete?.Invoke(this, EventArgs.Empty);
         }
 
         private void HandleIterationComplete(object sender, IterationEventArgs e)

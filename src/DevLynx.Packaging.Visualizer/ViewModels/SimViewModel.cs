@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO.Packaging;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,6 +30,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
+using Quaternion = System.Windows.Media.Media3D.Quaternion;
 
 namespace DevLynx.Packaging.Visualizer.ViewModels
 {
@@ -251,6 +253,9 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
         private void StartAnimation()
         {
+            if (Current == null) return;
+
+
             SolidAnimationEcho echo = null;
 
             if (Context.Rendering)
@@ -361,6 +366,8 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
         private void HandleAnimationComplete(object sender, EventArgs e)
         {
+            if (Current == null) return;
+
             //Console.WriteLine(sender);
             //if (sender is not AnimationTimeline anim) return;
             //anim.Completed -= HandleAnimationComplete;
@@ -427,9 +434,9 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
         private void LoadIteration()
         {
             PackIteration itr = Current;
-            var inst = itr.Instances;
-
-            Context.SimContainer = itr.Container;
+            IEnumerable<PackInstance> inst = itr?.Instances ?? Enumerable.Empty<PackInstance>();
+            
+            Context.SimContainer = itr?.Container ?? new Vector3(Context.Container.Width, Context.Container.Width, Context.Container.Width);
             //return;
 
 
@@ -465,7 +472,8 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
 
             //Vector3D cv = new Vector3D(Context.Container.Width, Context.Container.Height, Context.Container.Depth);
-            Vector3D cv = new Vector3D(itr.Container.X, itr.Container.Y, itr.Container.Z);
+            //Vector3D cv = new Vector3D(itr.Container.X, itr.Container.Y, itr.Container.Z);
+            Vector3D cv = new Vector3D(Context.SimContainer.X, Context.SimContainer.Y, Context.SimContainer.Z);
             //cv = rot.Transform(cv);
 
 
@@ -485,9 +493,9 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
             double maxX = 0, maxY = 0, maxZ = 0;
 
-            for (int i = 0; i < inst.Count; i++)
+            for (int i = 0; i < inst.Count(); i++)
             {
-                var pack = inst[i];
+                var pack = inst.ElementAt(i);
                 pack.Model = model = new Model3DGroup();
                 //model.Transform = new TranslateTransform3D(worldStart.X, worldStart.Y + pack.Dim.Y, worldStart.Z);
 

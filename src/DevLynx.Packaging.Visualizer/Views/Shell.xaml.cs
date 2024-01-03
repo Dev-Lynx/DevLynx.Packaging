@@ -31,9 +31,8 @@ namespace DevLynx.Packaging.Visualizer
             DataContext = ioc.Resolve<ShellViewModel>();
             InitializeComponent();
 
-            rgm.RegisterViewWithRegion<SimView>(AppBase.MAIN_REGION);
             rgm.RegisterViewWithRegion<StartView>(AppBase.MAIN_REGION);
-            
+            rgm.RegisterViewWithRegion<SimView>(AppBase.MAIN_REGION);
         }
     }
 }

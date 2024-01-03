@@ -18,6 +18,8 @@ namespace DevLynx.Packaging.Visualizer.UI
         {
             bool bValue = false;
             if (value is bool) bValue = (bool)value;
+            else if (value is Visibility v) bValue = v == Visibility.Visible;
+
             if (Inverse) bValue = !bValue;
 
             return (bValue) ? Visibility.Visible : HiddenValue;
@@ -25,10 +27,20 @@ namespace DevLynx.Packaging.Visualizer.UI
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool bValue = value as Visibility? == Visibility.Visible;
+            //if (value is )
+
+            //bool bValue = value as Visibility? == Visibility.Visible;
+            //if (Inverse) bValue = !bValue;
+
+            //return bValue;
+
+            bool bValue = false;
+            if (value is bool) bValue = (bool)value;
+            else if (value is Visibility v) bValue = v == Visibility.Visible;
+
             if (Inverse) bValue = !bValue;
-            
-            return bValue;
+
+            return (bValue) ? Visibility.Visible : HiddenValue;
         }
     }
 }

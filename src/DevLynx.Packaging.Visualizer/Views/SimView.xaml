@@ -50,7 +50,8 @@
                     <DockPanel
                         Margin="10,0,10,10"
                         VerticalAlignment="Top"
-                        DockPanel.Dock="Bottom">
+                        DockPanel.Dock="Bottom"
+                        Visibility="{Binding ElementName=_iterationPanel, Path=Visibility}">
 
                         <ui:Button
                             Margin="0,0,0,10"
@@ -92,111 +93,115 @@
 
 
 
-                    <Border
-                        Margin="0,0"
-                        Padding="5,40,5,40"
-                        VerticalAlignment="Center"
-                        Background="#ddd"
-                        Opacity=".8"
-                        TextElement.FontSize="15"
-                        TextElement.FontWeight="Medium">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                    <Grid>
+                        <Border
+                            Margin="0,0"
+                            Padding="5,40,5,40"
+                            VerticalAlignment="Center"
+                            d:Visibility="Hidden"
+                            Background="#ddd"
+                            Opacity=".8"
+                            TextElement.FontSize="15"
+                            TextElement.FontWeight="Medium"
+                            x:Name="_iterationPanel"
+                            Visibility="{Binding Context.Iterations.Count, Converter={StaticResource NotZeroConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
 
-                            <DockPanel
-                                Grid.Row="9"
-                                Grid.ColumnSpan="3"
-                                HorizontalAlignment="Center"
-                                Visibility="{Binding Current.IsBest, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <ui:SymbolIcon
-                                    Filled="True"
-                                    Foreground="{Binding ElementName=_bestIterationLabel, Path=Foreground}"
-                                    Symbol="StarEmphasis32" />
+                                <DockPanel
+                                    Grid.Row="9"
+                                    Grid.ColumnSpan="3"
+                                    HorizontalAlignment="Center"
+                                    Visibility="{Binding Current.IsBest, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <ui:SymbolIcon
+                                        Filled="True"
+                                        Foreground="{Binding ElementName=_bestIterationLabel, Path=Foreground}"
+                                        Symbol="StarEmphasis32" />
+                                    <TextBlock
+                                        x:Name="_bestIterationLabel"
+                                        Margin="5,0,0,0"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Foreground="#4caf50">
+                                        <Run Text="Best Iteration" />
+
+                                    </TextBlock>
+                                </DockPanel>
+
                                 <TextBlock
-                                    x:Name="_bestIterationLabel"
-                                    Margin="5,0,0,0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Foreground="#4caf50">
-                                    <Run Text="Best Iteration" />
-
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Text="Volume: " />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    FontSize="12"
+                                    TextWrapping="Wrap">
+                                    <Run Text="{Binding Current.Volume, StringFormat=N2, Mode=OneWay}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding Context.ContainerVolume, StringFormat=N2, Mode=OneWay}" />
                                 </TextBlock>
-                            </DockPanel>
 
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Text="Volume: " />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="2"
-                                FontSize="12"
-                                TextWrapping="Wrap">
-                                <Run Text="{Binding Current.Volume, StringFormat=N2, Mode=OneWay}" />
-                                <Run Text="/" />
-                                <Run Text="{Binding Context.ContainerVolume, StringFormat=N2, Mode=OneWay}" />
-                            </TextBlock>
-
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Text="Fully Packed: " />
-
-                            <TextBlock
-                                Grid.Row="4"
-                                Grid.Column="0"
-                                Text="Percentage Packed:" />
-
-                            <TextBlock Grid.Row="4" Grid.Column="2">
-                                <Run Text="{Binding Current.PercentagePacked, StringFormat=N2, Mode=OneWay}" />
-                                <Run Text="%" />
-                            </TextBlock>
-
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="0"
-                                Text="Total Packed: " />
-
-                            <TextBlock Grid.Row="3" Grid.Column="2">
-                                <Run Text="{Binding Current.TotalPacked, Mode=OneWay}" />
-                                <Run Text="/" />
-                                <Run Text="{Binding Context.Result.TotalBoxes, Mode=OneWay}" />
-                            </TextBlock>
-
-                            <Grid
-                                Grid.Row="2"
-                                Grid.Column="2"
-                                Margin="0,0,0,0"
-                                HorizontalAlignment="Left">
                                 <TextBlock
-                                    Width="22"
-                                    HorizontalAlignment="Left"
-                                    Foreground="#4ea752"
-                                    Text="Yes"
-                                    Visibility="{Binding Current.IsFullyPacked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Text="Fully Packed: " />
+
                                 <TextBlock
-                                    Foreground="#e04f5f"
-                                    Text="No"
-                                    Visibility="{Binding Current.IsFullyPacked, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                    Grid.Row="4"
+                                    Grid.Column="0"
+                                    Text="Percentage Packed:" />
+
+                                <TextBlock Grid.Row="4" Grid.Column="2">
+                                    <Run Text="{Binding Current.PercentagePacked, StringFormat=N2, Mode=OneWay}" />
+                                    <Run Text="%" />
+                                </TextBlock>
+
+                                <TextBlock
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Text="Total Packed: " />
+
+                                <TextBlock Grid.Row="3" Grid.Column="2">
+                                    <Run Text="{Binding Current.TotalPacked, Mode=OneWay}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding Context.Result.TotalBoxes, Mode=OneWay}" />
+                                </TextBlock>
+
+                                <Grid
+                                    Grid.Row="2"
+                                    Grid.Column="2"
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Left">
+                                    <TextBlock
+                                        Width="22"
+                                        HorizontalAlignment="Left"
+                                        Foreground="#4ea752"
+                                        Text="Yes"
+                                        Visibility="{Binding Current.IsFullyPacked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <TextBlock
+                                        Foreground="#e04f5f"
+                                        Text="No"
+                                        Visibility="{Binding Current.IsFullyPacked, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                </Grid>
+
+
+
                             </Grid>
-
-
-
-                        </Grid>
-                        <!--
+                            <!--
                         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -220,8 +225,36 @@
                                 PlaceholderText="Z Rot"
                                 Text="{Binding Rotation.Depth.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
-                        -->
-                    </Border>
+                            -->
+                        </Border>
+
+                        <Border VerticalAlignment="Center"
+                                Visibility="{Binding Context.Iterations.Count, Converter={StaticResource ZeroConverter}}"
+                                >
+                            <StackPanel>
+                                <Image
+                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                    Source="{DynamicResource EastwoodFatalError}"
+                                    Stretch="Uniform" />
+
+                                <TextBlock
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="20"
+                                    Text="Simulation gone wrong" />
+                                
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="14"
+                                    Text="We couldn't find any items that fit, please try again"
+                                    TextWrapping="Wrap"
+                                    TextAlignment="Center"
+                                    />
+
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
                 </DockPanel>
 

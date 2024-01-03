@@ -61,7 +61,7 @@
                             MaxDecimalPlaces="8"
                             Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                             Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                            Text="{Binding Context.Container.Width.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                            Text="{Binding Context.Container.Width.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoFocusBehavior />
                                 <rui:AutoHighlightBehavior />
@@ -78,7 +78,7 @@
                             MaxDecimalPlaces="8"
                             Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                             Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                            Text="{Binding Context.Container.Height.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                            Text="{Binding Context.Container.Height.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoHighlightBehavior />
                                 <rui:MaintainSelectionBehavior />
@@ -94,7 +94,7 @@
                             MaxDecimalPlaces="8"
                             Maximum="{x:Static nctx:PackageContext.MAX_DIM}"
                             Minimum="{x:Static nctx:PackageContext.MIN_DIM}"
-                            Text="{Binding Context.Container.Depth.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=2000}">
+                            Text="{Binding Context.Container.Depth.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Behaviors>
                                 <rui:AutoHighlightBehavior />
                                 <rui:MaintainSelectionBehavior />
@@ -130,6 +130,8 @@
                                     <ResourceDictionary Source="/DevLynx.Packaging.Visualizer;component/UI/Material.xaml" />
                                 </ResourceDictionary.MergedDictionaries>
 
+                                <!--  <Style TargetType="DataGrid"  -->
+
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -153,18 +155,66 @@
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding Width, StringFormat=N2}"
-                                Header="Width"
-                                IsReadOnly="True" />
+                                Header="Width">
+                                <DataGridTextColumn.EditingElementStyle>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate>
+                                                    <ui:TextBox Text="{Binding Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <i:Interaction.Behaviors>
+                                                            <rui:AutoFocusBehavior />
+                                                            <rui:AutoHighlightBehavior />
+                                                        </i:Interaction.Behaviors>
+                                                    </ui:TextBox>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGridTextColumn.EditingElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding Height, StringFormat=N2}"
-                                Header="Height"
-                                IsReadOnly="True" />
+                                Header="Height">
+                                <DataGridTextColumn.EditingElementStyle>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate>
+                                                    <ui:TextBox Text="{Binding Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <i:Interaction.Behaviors>
+                                                            <rui:AutoFocusBehavior />
+                                                            <rui:AutoHighlightBehavior />
+                                                        </i:Interaction.Behaviors>
+                                                    </ui:TextBox>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGridTextColumn.EditingElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding Depth, StringFormat=N2}"
-                                Header="Length"
-                                IsReadOnly="True" />
+                                Header="Length">
+                                <DataGridTextColumn.EditingElementStyle>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate>
+                                                    <ui:TextBox Text="{Binding Depth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <i:Interaction.Behaviors>
+                                                            <rui:AutoFocusBehavior />
+                                                            <rui:AutoHighlightBehavior />
+                                                        </i:Interaction.Behaviors>
+                                                    </ui:TextBox>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGridTextColumn.EditingElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTemplateColumn Header="Amount">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

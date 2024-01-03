@@ -246,6 +246,11 @@ namespace DevLynx.Packaging.Visualizer.Models.Contexts
             RaisePropertyChanged(nameof(Value));
         }
 
+        public override string ToString()
+        {
+            return _value;
+        }
+
         public static implicit operator float (LazySingle d) => d._num;
         public static implicit operator LazySingle(float f) => new LazySingle(f);
     }

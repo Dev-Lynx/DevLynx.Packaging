@@ -25,6 +25,7 @@
     <ItemGroup>
       <None Remove="UI\Assets\cur\ClosedHand.cur" />
       <None Remove="UI\Assets\cur\OpenHand.cur" />
+      <None Remove="UI\Assets\illustrations\eastwood\eastwood-fatal-error.png" />
       <None Remove="UI\Assets\illustrations\eastwood\eastwood-no-comments.png" />
       <None Remove="UI\Assets\paper_0025.jpg" />
       <None Remove="UI\Assets\tx_paper_0021_ao_2k.jpg" />
