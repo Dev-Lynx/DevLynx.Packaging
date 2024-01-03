@@ -1,0 +1,129 @@
+﻿<UserControl
+    x:Class="DevLynx.Packaging.Visualizer.Views.AboutView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app="clr-namespace:DevLynx.Packaging.Visualizer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:DevLynx.Packaging.Visualizer.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rui="clr-namespace:DevLynx.Packaging.Visualizer.UI"
+    xmlns:vm="clr-namespace:DevLynx.Packaging.Visualizer.ViewModels"
+    d:DataContext="{d:DesignInstance vm:AboutViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid>
+
+        <ScrollViewer>
+            <Border Padding="20">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top">
+                        <Image
+                            Width="128"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="{DynamicResource AppLogo}" />
+
+                        <StackPanel Margin="20,0,0,0" VerticalAlignment="Center">
+                            <TextBlock FontSize="25">
+                                <Run Text="{x:Static app:AppBase.PRODUCT_NAME}" />
+                                <Run FontSize="16" Text="{x:Static app:AppBase.PRODUCT_VERSION}" />
+                            </TextBlock>
+
+                            <TextBlock FontSize="14" Text="Simple Bin Packing Simulator" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <StackPanel Margin="0,100,0,0" DockPanel.Dock="Bottom">
+                        <Image
+                            Width="200"
+                            HorizontalAlignment="Left"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="{DynamicResource DevLynxLogo}" />
+
+                        <TextBlock
+                            Margin="0,10,0,0"
+                            FontSize="24"
+                            Text="Dev-Lynx Technologies" />
+                        <TextBlock
+                            Margin="0,2,0,0"
+                            FontSize="14"
+                            Text="© Copyright 2024" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,40,0,0">
+                        <TextBlock FontSize="18" Text="Acknowledgements" />
+                        <StackPanel>
+                            <TextBlock Margin="0,6,0,0" TextWrapping="Wrap">
+                                <Run FontWeight="Bold" Text="Erhan Baltacioglu, James T. Moore and Raymond R. Hill Jr:" />
+                                <Run Text="Authors of" />
+                                <Hyperlink
+                                    FontWeight="DemiBold"
+                                    Foreground="{DynamicResource PrimaryBrush}"
+                                    NavigateUri="https://www.inderscienceonline.com/doi/abs/10.1504/IJOR.2006.009300"
+                                    TextDecorations="None">
+                                    <i:Interaction.Behaviors>
+                                        <rui:ExternalLinkBehavior />
+                                    </i:Interaction.Behaviors>
+                                    <Run Text="The distributor's three-dimensional pallet-packing problem: a human intelligence-based heuristic approach" />
+                                </Hyperlink>
+                                <Run Text="and designers of the EB_AFIT algorithm used in this application" />
+                            </TextBlock>
+
+                            <TextBlock Margin="0,6,0,0">
+
+                                <Hyperlink
+                                    FontWeight="DemiBold"
+                                    Foreground="{DynamicResource PrimaryBrush}"
+                                    NavigateUri="https://github.com/wknechtel"
+                                    TextDecorations="None">
+                                    <i:Interaction.Behaviors>
+                                        <rui:ExternalLinkBehavior />
+                                    </i:Interaction.Behaviors>
+                                    <Run Text="Bill Knechtel: " />
+                                </Hyperlink>
+
+                                <Run Text="Uploader of the adaptation in C that was eventually ported into this application" />
+                            </TextBlock>
+
+                        </StackPanel>
+
+
+
+                        <TextBlock
+                            Margin="0,30,0,0"
+                            FontSize="18"
+                            Text="Components" />
+
+                        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding NotableLibraries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0 10 0 0">
+                                        <TextBlock>
+                                            <Hyperlink
+                                                FontSize="16"
+                                                FontWeight="DemiBold"
+                                                Foreground="{DynamicResource PrimaryBrush}"
+                                                NavigateUri="{Binding Link, Mode=OneWay}"
+                                                TextDecorations="None">
+                                                <i:Interaction.Behaviors>
+                                                    <rui:ExternalLinkBehavior />
+                                                </i:Interaction.Behaviors>
+                                                <Run Text="{Binding Text, Mode=OneWay}" />
+                                            </Hyperlink>
+                                        </TextBlock>
+
+                                        <TextBlock Text="{Binding Description}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+
+                </DockPanel>
+            </Border>
+
+        </ScrollViewer>
+    </Grid>
+</UserControl>

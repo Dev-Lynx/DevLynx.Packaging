@@ -321,7 +321,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                     //        EasingMode = EasingMode.EaseInOut
                     //    }
                     //};
-                    Console.WriteLine("Begining Animation");
+                    //Console.WriteLine("Begining Animation");
 
                     //for (int i = 0; i < _storyboard.Children.Count; i++)
                     //{
@@ -387,7 +387,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 if (model.Transform is not Transform3DGroup transform) return;
                 if (transform.Children.ElementAtOrDefault(0) is not ScaleTransform3D stransform) return;
 
-                Console.WriteLine("({0:N2}, {1:N2}, {2:N2})", stransform.ScaleX, stransform.ScaleY, stransform.ScaleZ);
+                //Console.WriteLine("({0:N2}, {1:N2}, {2:N2})", stransform.ScaleX, stransform.ScaleY, stransform.ScaleZ);
             }
 
 
@@ -436,7 +436,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             PackIteration itr = Current;
             IEnumerable<PackInstance> inst = itr?.Instances ?? Enumerable.Empty<PackInstance>();
             
-            Context.SimContainer = itr?.Container ?? new Vector3(Context.Container.Width, Context.Container.Width, Context.Container.Width);
+            Context.SimContainer = itr?.Container ?? new Vector3(Context.Container.Width, Context.Container.Height, Context.Container.Depth);
             //return;
 
 
@@ -482,7 +482,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             double chy = Math.Abs(cv.Y / 2);
             double chz = Math.Abs(cv.Z / 2);
 
-            Console.WriteLine("B: <{0}, {1}, {2}>\tA: {3}", chx, chy, chz, cv);
+            //Console.WriteLine("B: <{0}, {1}, {2}>\tA: {3}", chx, chy, chz, cv);
             //Console.WriteLine("QQ: {0}", itr.Quaternion);
 
             Transform3DGroup transform = new Transform3DGroup();
@@ -575,8 +575,8 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             //tt.OffsetZ -= rt.CenterZ;
 
             //Console.WriteLine("Center: ({0:N2}, {1:N2}, {2:N2})", rt.CenterX, rt.CenterY, rt.CenterZ);
-            Console.WriteLine("Offset: ({0:N2}, {1:N2}, {2:N2})", tt.OffsetX, tt.OffsetY, tt.OffsetZ);
-            Console.WriteLine("CN: ({0:N2}, {1:N2}, {2:N2})", cv.X, cv.Y, cv.Z);
+            //Console.WriteLine("Offset: ({0:N2}, {1:N2}, {2:N2})", tt.OffsetX, tt.OffsetY, tt.OffsetZ);
+            //Console.WriteLine("CN: ({0:N2}, {1:N2}, {2:N2})", cv.X, cv.Y, cv.Z);
         }
     }
 }

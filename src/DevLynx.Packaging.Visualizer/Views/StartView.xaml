@@ -127,10 +127,8 @@
                         <DataGrid.Resources>
                             <ResourceDictionary>
                                 <ResourceDictionary.MergedDictionaries>
-                                    <ResourceDictionary Source="/DevLynx.Packaging.Visualizer;component/UI/Material.xaml" />
+                                    <ResourceDictionary Source="pack://application:,,,/UI/Material.xaml" />
                                 </ResourceDictionary.MergedDictionaries>
-
-                                <!--  <Style TargetType="DataGrid"  -->
 
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="HorizontalAlignment" Value="Stretch" />

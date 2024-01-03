@@ -14,6 +14,7 @@ using NLog.Config;
 using NLog.Fluent;
 using NLog.Targets;
 using Prism;
+using Prism.DryIoc;
 using Prism.Ioc;
 
 namespace DevLynx.Packaging.Visualizer
@@ -24,6 +25,7 @@ namespace DevLynx.Packaging.Visualizer
     public partial class App
     {
         public ILogger Log;
+        public static IContainerProvider IOC;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -48,6 +50,7 @@ namespace DevLynx.Packaging.Visualizer
 
         protected override Window CreateShell()
         {
+            IOC = Container;
             return Container.Resolve<Shell>();
         }
 

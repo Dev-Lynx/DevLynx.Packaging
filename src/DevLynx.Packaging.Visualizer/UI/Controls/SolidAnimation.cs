@@ -214,37 +214,5 @@ namespace DevLynx.Packaging.Visualizer.UI
 
             return nextEcho;
         }
-
-        private static void BeginAnimationInternal(Animatable animatable, DoubleAnimationUsingKeyFrames[] frames, SolidAnimationKind kind)
-        {
-            Console.WriteLine("Animating: {0}", animatable.GetHashCode());
-
-            switch (kind)
-            {
-                case SolidAnimationKind.Scale:
-                    animatable.BeginAnimation(ScaleTransform3D.ScaleXProperty, frames[0]);
-                    animatable.BeginAnimation(ScaleTransform3D.ScaleYProperty, frames[1]);
-                    animatable.BeginAnimation(ScaleTransform3D.ScaleZProperty, frames[2]);
-                    break;
-
-                case SolidAnimationKind.ScaleCenter:
-                    animatable.BeginAnimation(ScaleTransform3D.CenterXProperty, frames[0]);
-                    animatable.BeginAnimation(ScaleTransform3D.CenterYProperty, frames[1]);
-                    animatable.BeginAnimation(ScaleTransform3D.CenterZProperty, frames[2]);
-                    break;
-
-                case SolidAnimationKind.Translate:
-                    animatable.BeginAnimation(TranslateTransform3D.OffsetXProperty, frames[0]);
-                    animatable.BeginAnimation(TranslateTransform3D.OffsetYProperty, frames[1]);
-                    animatable.BeginAnimation(TranslateTransform3D.OffsetZProperty, frames[2]);
-                    break;
-
-                case SolidAnimationKind.RotateCenter:
-                    animatable.BeginAnimation(RotateTransform3D.CenterXProperty, frames[0]);
-                    animatable.BeginAnimation(RotateTransform3D.CenterYProperty, frames[1]);
-                    animatable.BeginAnimation(RotateTransform3D.CenterZProperty, frames[2]);
-                    break;
-            }
-        }
     }
 }

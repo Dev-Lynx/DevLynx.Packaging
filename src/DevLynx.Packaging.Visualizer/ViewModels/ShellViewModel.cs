@@ -1,9 +1,12 @@
-﻿using DevLynx.Packaging.Visualizer.Extensions;
+﻿using Accessibility;
+using DevLynx.Packaging.Visualizer.Extensions;
 using DevLynx.Packaging.Visualizer.Models;
 using DevLynx.Packaging.Visualizer.Models.Contexts;
 using DevLynx.Packaging.Visualizer.Services;
+using DevLynx.Packaging.Visualizer.Views;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -28,22 +31,28 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
     {
         public ICommand DialogLoadedCommand { get; }
         public ICommand SnackbarLoadedCommand { get; }
+        public ICommand NavigateCommand { get; }
+
+        public string MenuViewTag { get; set; } = "home";
 
         public DialogContext Dialog => _appService.Context.Dialog;
         public PackageContext PContext => _packagingService.Context;
 
         private readonly IAppService _appService;
         private readonly IMessageService _messageService;
+        private readonly IRegionManager _rgm;
         private readonly IPackagingService _packagingService;
 
-        public ShellViewModel(IAppService appService, IMessageService messageService, IPackagingService packagingService)
+        public ShellViewModel(IAppService appService, IMessageService messageService, IPackagingService packagingService, IRegionManager rgm)
         {
             DialogLoadedCommand = new DelegateCommand<object>(HandleDialogLoaded);
             SnackbarLoadedCommand = new DelegateCommand<object>(HandleSnackbarLoaded);
+            NavigateCommand = new DelegateCommand<object>(HandleNavigation);
 
             _appService = appService;
             _messageService = messageService;
             _packagingService = packagingService;
+            _rgm = rgm;
         }
 
         private void HandleDialogLoaded(object obj)
@@ -62,6 +71,24 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
 
             if (_messageService is UIMessageService ums)
                 ums.RegisterSnackbar(snackbar);
+        }
+
+        private void HandleNavigation(object obj)
+        {
+            if (obj is not string tag) return;
+
+            switch (tag)
+            {
+                case "about":
+                    _rgm.NavigateToView<AboutView>(AppBase.MENU_REGION);
+                    break;
+
+                default:
+                    _rgm.NavigateToView<HomeView>(AppBase.MENU_REGION);
+                    break;
+            }
+
+            MenuViewTag = tag;
         }
     }
 }

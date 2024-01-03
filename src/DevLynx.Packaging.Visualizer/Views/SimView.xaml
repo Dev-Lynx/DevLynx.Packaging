@@ -95,6 +95,7 @@
 
                     <Grid>
                         <Border
+                            x:Name="_iterationPanel"
                             Margin="0,0"
                             Padding="5,40,5,40"
                             VerticalAlignment="Center"
@@ -103,7 +104,6 @@
                             Opacity=".8"
                             TextElement.FontSize="15"
                             TextElement.FontWeight="Medium"
-                            x:Name="_iterationPanel"
                             Visibility="{Binding Context.Iterations.Count, Converter={StaticResource NotZeroConverter}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -228,9 +228,7 @@
                             -->
                         </Border>
 
-                        <Border VerticalAlignment="Center"
-                                Visibility="{Binding Context.Iterations.Count, Converter={StaticResource ZeroConverter}}"
-                                >
+                        <Border VerticalAlignment="Center" Visibility="{Binding Context.Iterations.Count, Converter={StaticResource ZeroConverter}}">
                             <StackPanel>
                                 <Image
                                     RenderOptions.BitmapScalingMode="HighQuality"
@@ -242,15 +240,14 @@
                                     HorizontalAlignment="Center"
                                     FontSize="20"
                                     Text="Simulation gone wrong" />
-                                
+
                                 <TextBlock
                                     Margin="0,4,0,0"
                                     HorizontalAlignment="Center"
                                     FontSize="14"
                                     Text="We couldn't find any items that fit, please try again"
-                                    TextWrapping="Wrap"
                                     TextAlignment="Center"
-                                    />
+                                    TextWrapping="Wrap" />
 
                             </StackPanel>
                         </Border>

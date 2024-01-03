@@ -35,7 +35,58 @@
                 ShowMinimize="True"
                 UseSnapLayout="True" />
 
-            <DockPanel>
+            <ui:NavigationStore SelectedPageIndex="0" TransitionType="FadeIn">
+                <ui:NavigationStore.Items>
+                    <ui:NavigationItem
+                        Cache="True"
+                        Command="{Binding NavigateCommand}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=PageTag}"
+                        Content="Home"
+                        Icon="Home24"
+                        PageTag="home">
+                        <ui:NavigationItem.IsActive>
+                            <MultiBinding Converter="{StaticResource EquityConverter}">
+                                <Binding Path="MenuViewTag" />
+                                <Binding Path="PageTag" RelativeSource="{RelativeSource Self}" />
+                            </MultiBinding>
+                        </ui:NavigationItem.IsActive>
+                    </ui:NavigationItem>
+
+                    <ui:NavigationItem
+                        Command="{Binding NavigateCommand}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=PageTag}"
+                        Content="About"
+                        Icon="Info24"
+                        PageTag="about">
+                        <ui:NavigationItem.IsActive>
+                            <MultiBinding Converter="{StaticResource EquityConverter}">
+                                <Binding Path="MenuViewTag" />
+                                <Binding Path="PageTag" RelativeSource="{RelativeSource Self}" />
+                            </MultiBinding>
+                        </ui:NavigationItem.IsActive>
+                    </ui:NavigationItem>
+                </ui:NavigationStore.Items>
+            </ui:NavigationStore>
+
+            <ContentControl prism:RegionManager.RegionName="{x:Static app:AppBase.MENU_REGION}">
+                <rui:ContentControlProps.ChangedAnimation>
+                    <Storyboard>
+                        <ThicknessAnimation
+                            Storyboard.TargetProperty="Margin"
+                            From="0,30,0,-30"
+                            To="0"
+                            Duration="0:0:0.3" />
+                    </Storyboard>
+                </rui:ContentControlProps.ChangedAnimation>
+            </ContentControl>
+
+            <!--<Frame x:Name="_rootFrame" />-->
+
+
+
+
+
+            <!--<DockPanel>
                 <ContentControl prism:RegionManager.RegionName="{Binding Source={x:Static app:AppBase.MAIN_REGION}}">
                     <rui:ContentControlProps.ChangedAnimation>
                         <Storyboard>
@@ -43,7 +94,7 @@
                         </Storyboard>
                     </rui:ContentControlProps.ChangedAnimation>
                 </ContentControl>
-            </DockPanel>
+            </DockPanel>-->
         </DockPanel>
 
         <ui:Dialog ButtonLeftAppearance="Info">
@@ -58,7 +109,7 @@
                     <rui:DialogSelector>
                         <rui:DialogSelector.ItemDialogTemplate>
                             <DataTemplate>
-                                <!--DataContext="{Binding ElementName=_rootWindow, Path=DataContext}"-->
+                                <!--  DataContext="{Binding ElementName=_rootWindow, Path=DataContext}"  -->
                                 <controls:ViewResolver TargetView="{x:Type views:ItemDialog}" />
                             </DataTemplate>
                         </rui:DialogSelector.ItemDialogTemplate>

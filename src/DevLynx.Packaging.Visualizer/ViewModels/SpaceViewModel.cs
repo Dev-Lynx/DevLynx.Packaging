@@ -179,6 +179,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (qq.Z < Z_LOWER) qq.Z = Z_LOWER;
             else if (qq.Z > Z_UPPER) qq.Z = Z_UPPER;
 
+            qq.Normalize();
             qrot.Quaternion = qq;
         }
 
@@ -203,7 +204,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 z = Math.Max(z, min);
                 z = Math.Min(z, max);
 
-                Console.WriteLine("ZZZ: {0}", z);
+                //Console.WriteLine("ZZZ: {0}", z);
 
                 cam.Position = new Point3D(cam.Position.X, cam.Position.Y, z);
             }
@@ -236,7 +237,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             if (m2.Transform is not Transform3DGroup g2) return;
             if (g2.Children.ElementAtOrDefault(1) is not ScaleTransform3D s2) return;
 
-            _logger.Warn("[Render started] {0} {1}", _lModel.GetHashCode(), _model.GetHashCode());
+            //_logger.Warn("[Render started] {0} {1}", _lModel.GetHashCode(), _model.GetHashCode());
 
 
             var echo = s1
@@ -244,7 +245,7 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
                 .ThenBegin(s2, _upAnim, SolidAnimationKind.Scale)
                 .Then(() =>
                 {
-                    _logger.Warn("[Animation complete] {0}", s2.ScaleX);
+                    //_logger.Warn("[Animation complete] {0}", s2.ScaleX);
                     _scene.Children.Remove(m1);
                     _pcontext.Rendering = false;
                 });
@@ -329,8 +330,6 @@ namespace DevLynx.Packaging.Visualizer.ViewModels
             var con = _packagingService.Context.SimContainer;
             if (con == Vector3.Zero)
                 con = new Vector3(_packagingService.Context.Container.Width, _packagingService.Context.Container.Height, _packagingService.Context.Container.Depth);
-
-            _logger.Warn("Container: {0}", con);
 
             double w = con.X * viewRatio;
             double h = con.Y * viewRatio;

@@ -22,10 +22,15 @@
                 Stretch="Uniform"
                 TileMode="Tile" />
 
+            <SolidColorBrush x:Key="PrimaryBrush" Color="#0066cc" />
+
             <!--#region Cursors-->
             <Control x:Key="OpenHandCursor" Cursor="/UI/Assets/cur/OpenHand.cur" />
             <Control x:Key="ClosedHandCursor" Cursor="/UI/Assets/cur/ClosedHand.cur" />
             <!--#endregion-->
+
+            <BitmapImage x:Key="DevLynxLogo" UriSource="/UI/Assets/dev-lynx.png" />
+            <BitmapImage x:Key="AppLogo" UriSource="/UI/Assets/app.ico" />
 
             <!--#region Illustrations-->
             <BitmapImage x:Key="EastwoodNoComments" UriSource="/UI/Assets/illustrations/eastwood/eastwood-no-comments.png" />
@@ -38,6 +43,8 @@
                 x:Key="ZeroConverter"
                 HiddenCount="0"
                 Inverse="True" />
+            <nui:EquityConverter x:Key="EquityConverter" />
+            <nui:EquityConverter x:Key="InverseEquityConverter" Invert="True" />
             <nui:MathConverter x:Key="MathConverter" />
             <nui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <nui:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
